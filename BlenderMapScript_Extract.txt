@@ -1,0 +1,3 @@
+open {3}
+extract {4} {1}
+extract {5} {2}
