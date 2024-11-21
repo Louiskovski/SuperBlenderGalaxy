@@ -4807,6 +4807,17 @@ def ZonenCreate(ZonenName, ZoneID):
     # c = bpy.data.collections.new(cname)
     # bpy.data.collections.get(shared_assets_collection_name).children.link(c)
 	
+class AddZoneToScenario(bpy.types.Operator):
+    """Add zone to scenario"""
+    bl_idname = "scenario55.addzone" 
+    bl_label = "Add Zone to scenario"
+    def execute(self, context):
+        ZoneName = bpy.context.collection.name
+        if "Zone ID" in bpy.context.collection:
+            for scene in bpy.data.scenes:
+                if "ScenarioName" in scene:
+                    bpy.context.scene[ZoneName] = "0"
+        return {'FINISHED'}
 
 def ScenarioARCEntpacken(GalaxyMapName, WiiExplorerPathFolder, GalaxyFilesystem):
 
@@ -7571,54 +7582,118 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Obj_Arg1"]')
-            row = layout.row()
+            row = layout.row(align=True)
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Obj_Arg2"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Obj_Arg3"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Obj_Arg4"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Obj_Arg5"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Obj_Arg6"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Obj_Arg7"]')
             
             layout.label(text="Switches")
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["SW_APPEAR"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["SW_DEAD"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["SW_A"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["SW_B"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["SW_AWAKE"]')
             
             layout.label(text="Groups")
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Group ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Clipping Group ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
+            row = layout.row(align=True)
+            row.scale_y = 0.5
             row = layout.prop(bpy.context.object, '["Cutscene Group ID"]')
 
+class LayoutSMGMapScenarioPanel(bpy.types.Panel):
 
+
+    """Creates a Panel in the scene context of the properties editor"""
+    bl_label = "Mario Galaxy - Scenario"
+    bl_idname = "SCENE_GalaxyMapScenario_layout" 
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Mario Galaxy"
+
+    def draw(self, context):
+    
+        if "Comet Time Limit" in bpy.context.scene:
+        
+            layout = self.layout
+            scene = context.scene
+        
+            layout.label(text="Settings")
+            split = layout.split() #Splitte Rows
+            col = split.column(align=True)
+            col.prop(bpy.context.scene, '["ScenarioNo"]')
+            col = split.column(align=True)
+            col.prop(bpy.context.scene, '["ScenarioName"]')
+            
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.scene, '["StarMask"]')
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.scene, '["Scenario Type"]')
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.scene, '["Power Star Trigger"]')
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.scene, '["Comet"]')
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.scene, '["Comet Time Limit"]')
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.scene, '["LuigiModeTimer (unused)"]')
+            
+            layout.label(text="Zone Layer Display")
+            layout.label(text="(Select Zone Collection)")
+            
+
+            if "Zone ID" in bpy.context.collection:
+                if bpy.context.collection.name in bpy.context.scene:
+
+                    ZoneMaskName = bpy.context.collection.name
+                    row = layout.row()
+                    row.scale_y = 1.2
+                    row = layout.prop(bpy.context.scene, '["' + ZoneMaskName + '"]')
+                else:
+                    row = layout.row()
+                    row.scale_y = 1.2
+                    row = layout.label(text="Zone not in scenario!")
+                    row = layout.row()
+                    row.scale_y = 1.2
+                    row.operator("scenario55.addzone", icon='ADD') #new zone
+
+            
+            
+            
 class LayoutSMGMapMenu1(bpy.types.Menu):
     bl_label = "Add Mario Galaxy Object Properties for your collection asset"
     bl_idname = "OBJECT_MT_simple_custom_menu1"
@@ -7760,6 +7835,9 @@ def register():
     bpy.utils.register_class(GalaxyMap_AddMapPartProps)
     bpy.utils.register_class(GalaxyMap_AddObjProps)
     
+    
+    bpy.utils.register_class(AddZoneToScenario)
+    
     bpy.utils.register_class(WM_OT_myOp)
     
 
@@ -7771,6 +7849,8 @@ def register():
     bpy.utils.register_class(LayoutSMGMap_AddGravityPanel)
     bpy.utils.register_class(LayoutSMGMap_AddCutscenePanel)
     bpy.utils.register_class(LayoutSMGMap_ChangeAreaShapePanel)
+    bpy.utils.register_class(LayoutSMGMapScenarioPanel)
+    
     
     bpy.utils.register_class(GalaxyMap_LayoutStarter2)
     bpy.utils.register_class(GalaxyMap_LayoutStarter3)
@@ -7793,6 +7873,7 @@ def register():
     bpy.utils.register_class(GalaxyMapChangeAreaShape_2)
     bpy.utils.register_class(GalaxyMapChangeAreaShape_3)
     bpy.utils.register_class(GalaxyMapChangeAreaShape_4)
+
     #bpy.types.VIEW3D_MT_object.append(menu_func)
     #bpy.utils.register_class(GalaxyMapInitialize)
     
@@ -7837,6 +7918,8 @@ def unregister():
     bpy.utils.unregister_class(GalaxyMap_AddMapPartProps)
     bpy.utils.unregister_class(GalaxyMap_AddObjProps)
     
+    bpy.utils.unregister_class(AddZoneToScenario)
+    
     bpy.utils.unregister_class(WM_OT_myOp)
 
 
@@ -7848,6 +7931,7 @@ def unregister():
     bpy.utils.unregister_class(LayoutSMGMap_AddGravityPanel)
     bpy.utils.unregister_class(LayoutSMGMap_AddCutscenePanel)
     bpy.utils.unregister_class(LayoutSMGMap_ChangeAreaShapePanel)
+    bpy.utils.unregister_class(LayoutSMGMapScenarioPanel)
     
     bpy.utils.unregister_class(GalaxyMap_LayoutStarter2)
     bpy.utils.unregister_class(GalaxyMap_LayoutStarter3)
