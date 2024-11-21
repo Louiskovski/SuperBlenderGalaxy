@@ -11,7 +11,7 @@ Still pretty WIP. Make backups of your levels.
 - Download the text files and place these in the same directory as the WiiExplorer.exe
 
 Now start Blender and install the addon
-- In the 3D View on the right click on the *Mario Galaxy* tab and enter the required paths at the *path* column
+- In the 3D View on the right click on the *Mario Galaxy* tab enter the required paths at the *path* column
 
 # Importing Levels
 
