@@ -16,7 +16,7 @@ Now start Blender and install the addon
 # Importing Levels
 
 You can import full galaxies or individual zones. Simply enter the zone or galaxy name and click on Import Galaxy or Import Zone.
-If Asset Searching Enabled is set to 1, the plugin searches for assets in a given folder structure using the levels object names in Blender files and links them. More about this at **Asset Usage**.
+If **Asset Searching Enabled** is set to 1, the plugin searches for assets in a given folder structure using the levels object names in Blender files and links them. More about this at **Asset Usage**.
 
 # Exporting Levels
 
@@ -54,15 +54,19 @@ Once a type is selected, Blender will probably freeze briefly. If this is the ca
 ### Editing objects
 Select an object and go to the *Mario Galaxy - Object Settings* tab to get all editable parameters of the selected objects such as object aruments, area shapes, gravity sizes, and more.
 
-You will also find an **Alternative Name** string. If you enter an name here, the exporter will ignore the actual object name and will use this one instead. This is required if you have multiple objects with the same name, as Blender's outliner can not store the same object name (adds an .001 add the name). When adding objects, it adds an name in this field by default.
+You will also find an **Alternative Name** string. If you enter an name here, the exporter will ignore the actual object name and will use this one instead. This is required if you have multiple objects with the same name, as Blender's outliner can not store the same object name (adds an .001 to the name). When adding objects, it adds an name in this field by default.
 
 ### Paths
 
 Paths can have parameters per point, so to edit these, go to editing mode and select the point, then go to the *Item* tab to the *Transform* column:
 - **Mean Tilt** The point speed (arg 0)
-- **Mean Radius** The point stop value, but in the formula Y.XXXX (XXXX is the actual speed, Y sets, if it is enabled at all: 1 = false, 0 = true)
+- **Mean Radius** The point stop value (arg5), but in the formula Y.XXXX (XXXX is the actual speed, Y sets, if it is enabled at all: 1 = false, 0 = true)
 
 To get more point settings for an ordinary path, click on **Path** under *Point Settings* under *Mario Galaxy - Object Settings*. This will ad an geometry node you can set in the paths modifer settings. Set *PointID* and the modifier name to the point you want to have the settings (a marker will be visible in the 3D View)
+
+The Path ID is defined here. If you add a new path, you must enter a new ID here:
+
+![screenshot](pictureB.png)
 
 ### Layer Editing
 
