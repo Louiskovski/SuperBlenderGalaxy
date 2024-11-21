@@ -17,7 +17,7 @@ Now start Blender and install the addon
 
 Before doing anything, save your Blender file.
 
-You can import full galaxies or individual zones. Simply enter the zone or galaxy name and click on Import Galaxy or Import Zone.
+You can import full galaxies and/or individual zones. Simply enter the zone or galaxy name and click on Import Galaxy or Import Zone.
 If **Asset Searching Enabled** is set to 1, the plugin searches for assets in a given folder structure using the levels object names in Blender files and links them. More about this at **Asset Usage**.
 
 # Exporting Levels
