@@ -76,7 +76,7 @@ Select a zone's collection and click on **Start Camera Editor** in the *Mario Ga
 
 To use loadable model assets in the editor, you must put your 3D model into a collection and give this collection the object name to be used. If your model contains additional things that should not be visible in the editor, such as collision, deactivate the visibility in the viewport of the model/collection (via the monitor icon). Then right-click on the collection and click on **Mark As Asset**.
 
-![screenshot](screenshot.png)
+![screenshot](pictureA.png)
 
 If you now add an object with the same name, or import a zone/galaxy that contains this object name, the 3D model will now be visible when:
 -The asset is in the same blend file as the level
