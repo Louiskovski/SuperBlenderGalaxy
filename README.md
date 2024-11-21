@@ -11,7 +11,7 @@ Still pretty WIP. Make backups of your levels.
 - Download the text files and place these in the same directory as the WiiExplorer.exe
 
 Now start Blender and install the addon
-- In the 3D View on the right click on the *Mario Galaxy* tab enter the required paths at the *path* column
+- In the 3D View on the right click on the *Mario Galaxy* tab and enter the required paths at the *path* column
 
 # Importing Levels
 
@@ -65,7 +65,7 @@ Paths can have parameters per point, so to edit these, go to editing mode and se
 - **Mean Tilt** The point speed (arg 0)
 - **Mean Radius** The point stop value (arg5), but in the formula Y.XXXX (XXXX is the actual speed, Y sets, if it is enabled at all: 1 = false, 0 = true)
 
-To get more point settings for an ordinary path, click on **Path** under *Point Settings* under *Mario Galaxy - Object Settings*. This will ad an geometry node you can set in the paths modifer settings. Set *PointID* and the modifier name to the point you want to have the settings (a marker will be visible in the 3D View)
+To get more point settings for an extra ordinary path, click on **Path** under *Point Settings* under *Mario Galaxy - Object Settings*. This will ad an geometry node you can set in the paths modifer settings. Set *PointID* and the modifier name to the point you want to have the settings (a marker will be visible in the 3D View)
 
 The Path ID is defined here. If you add a new path, you must enter a new ID here:
 
