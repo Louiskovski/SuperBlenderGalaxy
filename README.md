@@ -15,6 +15,8 @@ Now start Blender and install the addon
 
 # Importing Levels
 
+Before doing anything, save your Blender file.
+
 You can import full galaxies or individual zones. Simply enter the zone or galaxy name and click on Import Galaxy or Import Zone.
 If **Asset Searching Enabled** is set to 1, the plugin searches for assets in a given folder structure using the levels object names in Blender files and links them. More about this at **Asset Usage**.
 
@@ -22,6 +24,7 @@ If **Asset Searching Enabled** is set to 1, the plugin searches for assets in a 
 
 If you click on **Export Galaxy**, all zones will be exported and saved into your StageData filesystem. To export a single zone, select the collection with the zone name and click on **Export Zone**
 
+Your blender file needs to be saved in order to do this.
 # Creating new levels
 
 To create a brand new level, start with a new Blender file and click on **Create brand new galaxy**. This creates a new scene with a new scenario and a main zone. Now you can add several new zones with **Create new Zone**.
