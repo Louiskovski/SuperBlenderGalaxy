@@ -49,7 +49,7 @@ In Blender, each scenario is divided into scenes. To edit scenario settings, go 
 
 To export Scenariodata to your filesystem, click on **Export Scenario Info** in the Mario Galaxy Map Tools tab.
 
-###Galaxy Level Engine Note
+### Galaxy Level Engine Note
 Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngine) scenarios is also supported, but the export is unfinished!
 
 **Zone Layer Display**
