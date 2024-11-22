@@ -20,6 +20,11 @@ Before doing anything, save your Blender file.
 You can import full galaxies and/or individual zones. Simply enter the zone or galaxy name and click on Import Galaxy or Import Zone.
 If **Asset Searching Enabled** is set to 1, the plugin searches for assets in a given folder structure using the levels object names in Blender files and links them. More about this at **Asset Usage**.
 
+### Galaxy Level Engine Note
+
+Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngine) maps is also supported. Its relevant information can be found in the *GLE* Collection of the zone.
+
+
 # Exporting Levels
 
 If you click on **Export Galaxy**, all zones will be exported and saved into your StageData filesystem. To export a single zone, select the collection with the zone name and click on **Export Zone**
@@ -41,6 +46,11 @@ In Blender, each scenario is divided into scenes. To edit scenario settings, go 
 - **Comet Time Limit** In seconds
 - **LuigiModeTimer** Unused
 - **StarMask** This defines which stars from 1-6 are active, inactive. As of this version, its just displayed as a hash number, so get [this tool](https://kuribo64.net/get.php?id=0WxWiGQe9elhns2b) to get the correct values.
+
+To export Scenariodata to your filesystem, click on **Export Scenario Info** in the Mario Galaxy Map Tools tab.
+
+###Galaxy Level Engine Note
+Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngine) scenarios is also supported, but the export is unfinished!
 
 **Zone Layer Display**
 Select a zone's collection in the outliner to display which layers should be visible. If the zone does not have an entry in the scenario yet, a buttom appears that will do the job.
