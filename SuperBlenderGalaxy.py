@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Mario Galaxy Map Editor / Converter",
     "author": "Louis Miles",
-    "version": (0, 5, 0),
+    "version": (0, 5, 1),
     "blender": (3, 3, 2),
     "location": "In 3D Viewport right under 'Mario Galaxy'",
     "description": "Transforms Blender into a Mario Galaxy Level Editor",
@@ -994,44 +994,59 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object["Layer"] = LAYERname
                     
                     if AssetSearch == True:
-                        ### WIP - Linke Assets von anderen Blender Dateien ###    
-                        ##Idee: Das weglassen, und stattdessen als separaten Button einbauen, um Objekten ohne Assets es dann hinzubla       
-                        
-                        from bpy.props import StringProperty, BoolProperty
-                        from pathlib import Path
+                    
+                        try:
+                            bpy.context.object.instance_type = 'COLLECTION'
+                            bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
+                        except:
+                            print("Asset nicht in aktiver Blenderdatei")
+                    
+                    
+                            ### WIP - Linke Assets von anderen Blender Dateien ###    
+                            ##Idee: Das weglassen, und stattdessen als separaten Button einbauen, um Objekten ohne Assets es dann hinzubla       
+                            
+                            from bpy.props import StringProperty, BoolProperty
+                            from pathlib import Path
 
-                        def get_glob_files(folder, suffix, recursive=True):
-                            s = f'**/*{suffix}'  if recursive else f'*{suffix}'
-                            return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
+                            def get_glob_files(folder, suffix, recursive=True):
+                                s = f'**/*{suffix}'  if recursive else f'*{suffix}'
+                                return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
 
-                        # test
-                        #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
-                        folder_path = BlendFilesFolder
-                        print(get_glob_files(folder_path, '.blend'))
-                        #directory = folder_path
-                        for blend in get_glob_files(folder_path, '.blend'):
-                            try:
+                            # test
+                            #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
+                            folder_path = BlendFilesFolder
+                            print(get_glob_files(folder_path, '.blend'))
+                            #directory = folder_path
+                            for blend in get_glob_files(folder_path, '.blend'):
+                                try:
 
-                                # path to the blend
-                                #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
-                                filepath = blend
-                                print("Lese von dieser Blend Datei:")
-                                print(blend)
-                                # name of collection(s) to append or link
-                                coll_name = name
-                                # append, set to true to keep the link to the original file
-                                link = True
-                                # link all collections starting with 'objekttest'
-                                with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
-                                    data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
-                                # link collection to selected Empty
-                                bpy.context.object.instance_type = 'COLLECTION'
-                                bpy.context.object.instance_collection = bpy.data.collections[name]
-                            except:
-                                print("Dieses Asset wurde in der Library nicht gefunden:")
-                                print(name)
-                                pass
-                        ### WIP - Linke Assets von anderen Blender Dateien ### ENDE
+                                    # path to the blend
+                                    #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
+                                    filepath = blend
+                                    print("Lese von dieser Blend Datei:")
+                                    print(blend)
+                                    
+                                    if filepath == bpy.data.filepath:
+                                        print("Not allow load library from current file")
+                                        # Don't append current file, It will crash blender even the code inside the try:
+                                        #return
+                                    else:
+                                    
+                                        # name of collection(s) to append or link
+                                        coll_name = name
+                                        # append, set to true to keep the link to the original file
+                                        link = True
+                                        # link all collections starting with 'objekttest'
+                                        with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
+                                            data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
+                                        # link collection to selected Empty
+                                        bpy.context.object.instance_type = 'COLLECTION'
+                                        bpy.context.object.instance_collection = bpy.data.collections[name]
+                                except:
+                                    print("Dieses Asset wurde in der Library nicht gefunden:")
+                                    print(name)
+                                    pass
+                            ### WIP - Linke Assets von anderen Blender Dateien ### ENDE
 
 
                     obj = bpy.context.active_object # our created cube is the active one
@@ -1529,43 +1544,57 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object["Layer"] = LAYERname
                     
                     if AssetSearch == True:
-                        ### WIP - Linke Assets von anderen Blender Dateien ###    
-                        ##Idee: Das weglassen, und stattdessen als separaten Button einbauen, um Objekten ohne Assets es dann hinzubla       
-                        
-                        from bpy.props import StringProperty, BoolProperty
-                        from pathlib import Path
+                    
+                        try:
+                            bpy.context.object.instance_type = 'COLLECTION'
+                            bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
+                        except:
+                            print("Asset nicht in aktiver Blenderdatei")
+                    
+                    
+                            ### WIP - Linke Assets von anderen Blender Dateien ###    
+                            ##Idee: Das weglassen, und stattdessen als separaten Button einbauen, um Objekten ohne Assets es dann hinzubla       
+                            
+                            from bpy.props import StringProperty, BoolProperty
+                            from pathlib import Path
 
-                        def get_glob_files(folder, suffix, recursive=True):
-                            s = f'**/*{suffix}'  if recursive else f'*{suffix}'
-                            return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
+                            def get_glob_files(folder, suffix, recursive=True):
+                                s = f'**/*{suffix}'  if recursive else f'*{suffix}'
+                                return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
 
-                        # test
-                        #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
-                        folder_path = BlendFilesFolder
-                        print(get_glob_files(folder_path, '.blend'))
-                        #directory = folder_path
-                        for blend in get_glob_files(folder_path, '.blend'):
-                            try:
+                            # test
+                            #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
+                            folder_path = BlendFilesFolder
+                            print(get_glob_files(folder_path, '.blend'))
+                            #directory = folder_path
+                            for blend in get_glob_files(folder_path, '.blend'):
+                                try:
 
-                                # path to the blend
-                                #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
-                                filepath = blend
-                                print("Lese von dieser Blend Datei:")
-                                print(blend)
-                                # name of collection(s) to append or link
-                                coll_name = name
-                                # append, set to true to keep the link to the original file
-                                link = True
-                                # link all collections starting with 'objekttest'
-                                with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
-                                    data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
-                                # link collection to selected Empty
-                                bpy.context.object.instance_type = 'COLLECTION'
-                                bpy.context.object.instance_collection = bpy.data.collections[name]
-                            except:
-                                print("Dieses Asset wurde in der Library nicht gefunden:")
-                                print(name)
-                                pass
+                                    # path to the blend
+                                    #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
+                                    filepath = blend
+                                    print("Lese von dieser Blend Datei:")
+                                    print(blend)
+                                    if filepath == bpy.data.filepath:
+                                        print("Not allow load library from current file")
+                                        # Don't append current file, It will crash blender even the code inside the try:
+                                        #return
+                                    else:
+                                    
+                                        # name of collection(s) to append or link
+                                        coll_name = name
+                                        # append, set to true to keep the link to the original file
+                                        link = True
+                                        # link all collections starting with 'objekttest'
+                                        with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
+                                            data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
+                                        # link collection to selected Empty
+                                        bpy.context.object.instance_type = 'COLLECTION'
+                                        bpy.context.object.instance_collection = bpy.data.collections[name]
+                                except:
+                                    print("Dieses Asset wurde in der Library nicht gefunden:")
+                                    print(name)
+                                    pass
                         ### WIP - Linke Assets von anderen Blender Dateien ### ENDE
                     
                     
@@ -5601,7 +5630,7 @@ class GalaxyMapAddObject(bpy.types.Operator): #ADD Object
             AssetSearch = False
         else:
             AssetSearch = True
-        bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
+        #bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
         ObjektName = input("Enter Object Name: ")
         print(ObjektName)
         
@@ -5640,43 +5669,56 @@ class GalaxyMapAddObject(bpy.types.Operator): #ADD Object
         bpy.context.object["Layer"] = "Common"
         
         if AssetSearch == True:
-            ### WIP - Linke Assets von anderen Blender Dateien ###    
-            ##Idee: Das weglassen, und stattdessen als separaten Button einbauen, um Objekten ohne Assets es dann hinzubla       
-            
-            from bpy.props import StringProperty, BoolProperty
-            from pathlib import Path
+        
+            try:
+                bpy.context.object.instance_type = 'COLLECTION'
+                bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
+            except:
+                print("Asset nicht in aktiver Blenderdatei")
+        
+                ### WIP - Linke Assets von anderen Blender Dateien ###    
+                ##Idee: Das weglassen, und stattdessen als separaten Button einbauen, um Objekten ohne Assets es dann hinzubla       
+                
+                from bpy.props import StringProperty, BoolProperty
+                from pathlib import Path
 
-            def get_glob_files(folder, suffix, recursive=True):
-                s = f'**/*{suffix}'  if recursive else f'*{suffix}'
-                return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
+                def get_glob_files(folder, suffix, recursive=True):
+                    s = f'**/*{suffix}'  if recursive else f'*{suffix}'
+                    return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
 
-            # test
-            #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
-            folder_path = BlendFilesFolder
-            print(get_glob_files(folder_path, '.blend'))
-            #directory = folder_path
-            for blend in get_glob_files(folder_path, '.blend'):
-                try:
+                # test
+                #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
+                folder_path = BlendFilesFolder
+                print(get_glob_files(folder_path, '.blend'))
+                #directory = folder_path
+                for blend in get_glob_files(folder_path, '.blend'):
+                    try:
 
-                    # path to the blend
-                    #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
-                    filepath = blend
-                    print("Lese von dieser Blend Datei:")
-                    print(blend)
-                    # name of collection(s) to append or link
-                    coll_name = ObjektName
-                    # append, set to true to keep the link to the original file
-                    link = True
-                    # link all collections starting with 'objekttest'
-                    with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
-                        data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
-                    # link collection to selected Empty
-                    bpy.context.object.instance_type = 'COLLECTION'
-                    bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
-                except:
-                    print("Dieses Asset wurde in der Library nicht gefunden:")
-                    print(ObjektName)
-                    pass
+                        # path to the blend
+                        #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
+                        filepath = blend
+                        print("Lese von dieser Blend Datei:")
+                        print(blend)
+                        
+                        if filepath == bpy.data.filepath:
+                            print("Not allow load library from current file")
+                            # Don't append current file, It will crash blender even the code inside the try:
+                            #return
+                        else:
+                            # name of collection(s) to append or link
+                            coll_name = ObjektName
+                            # append, set to true to keep the link to the original file
+                            link = True
+                            # link all collections starting with 'objekttest'
+                            with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
+                                data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
+                            # link collection to selected Empty
+                            bpy.context.object.instance_type = 'COLLECTION'
+                            bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
+                    except:
+                        print("Dieses Asset wurde in der Library nicht gefunden:")
+                        print(ObjektName)
+                        pass
         
         
         
@@ -5706,7 +5748,7 @@ class GalaxyMapAddMapPart(bpy.types.Operator): #ADD MapPart
         else:
             AssetSearch = True
         
-        bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
+        #bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
         ObjektName = input("Enter Object Name: ")
         print(ObjektName)
         
@@ -5758,41 +5800,56 @@ class GalaxyMapAddMapPart(bpy.types.Operator): #ADD MapPart
             ### WIP - Linke Assets von anderen Blender Dateien ###    
             ##Idee: Das weglassen, und stattdessen als separaten Button einbauen, um Objekten ohne Assets es dann hinzubla       
             
-            from bpy.props import StringProperty, BoolProperty
-            from pathlib import Path
+            try:
+                bpy.context.object.instance_type = 'COLLECTION'
+                bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
+            except:
+                print("Asset nicht in aktiver Blenderdatei")
 
-            def get_glob_files(folder, suffix, recursive=True):
-                s = f'**/*{suffix}'  if recursive else f'*{suffix}'
-                return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
+                from bpy.props import StringProperty, BoolProperty
+                from pathlib import Path
 
-            # test
-            #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
-            folder_path = BlendFilesFolder
-            print(get_glob_files(folder_path, '.blend'))
-            #directory = folder_path
-            for blend in get_glob_files(folder_path, '.blend'):
-                try:
+                def get_glob_files(folder, suffix, recursive=True):
+                    s = f'**/*{suffix}'  if recursive else f'*{suffix}'
+                    return [str(fp) for fp in Path(folder).glob(s) if fp.is_file()]
 
-                    # path to the blend
-                    #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
-                    filepath = blend
-                    print("Lese von dieser Blend Datei:")
-                    print(blend)
-                    # name of collection(s) to append or link
-                    coll_name = ObjektName
-                    # append, set to true to keep the link to the original file
-                    link = True
-                    # link all collections starting with 'objekttest'
-                    with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
-                        data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
-                    # link collection to selected Empty
-                    bpy.context.object.instance_type = 'COLLECTION'
-                    bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
-                except:
-                    print("Dieses Asset wurde in der Library nicht gefunden:")
-                    print(ObjektName)
-                    pass
-        
+                # test
+                #folder_path = "C:\\SuperMarioGravity\\WORKSPACE\\01_Galaxien"
+                folder_path = BlendFilesFolder
+                print(get_glob_files(folder_path, '.blend'))
+                #directory = folder_path
+                for blend in get_glob_files(folder_path, '.blend'):
+                    try:
+
+                        # path to the blend
+                        #filepath = (self.directory, '.blend') #Kann man auch Library statt Blend Datei durchsuchen?
+                        filepath = blend
+                        print("Lese von dieser Blend Datei:")
+                        print(blend)
+                        
+                        if filepath == bpy.data.filepath:
+                            print("Not allow load library from current file")
+                            # Don't append current file, It will crash blender even the code inside the try:
+                            #return
+                        else:
+                            # name of collection(s) to append or link
+                            coll_name = ObjektName
+                            # append, set to true to keep the link to the original file
+                            link = True
+                            # link all collections starting with 'objekttest'
+                            with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
+                                data_to.collections = [c for c in data_from.collections if c.startswith(coll_name)]
+                            # link collection to selected Empty
+                            bpy.context.object.instance_type = 'COLLECTION'
+                            bpy.context.object.instance_collection = bpy.data.collections[ObjektName]
+                    except:
+                        print("Dieses Asset wurde in der Library nicht gefunden:")
+                        print(ObjektName)
+                        pass
+
+
+
+
         if "Zone ID" in bpy.context.collection:
             ZoneID = bpy.context.collection["Zone ID"]
             ZonePrefix = "  (Z" + str(ZoneID) + ")"
@@ -5975,7 +6032,7 @@ class GalaxyMapAddArea(bpy.types.Operator):
         BlendFilesFolder = bpy.context.workspace["Workspace (for searching in Blend files)"]
         MapAssetBlendFile = bpy.context.workspace["Map Assets Blend file"]
         
-        bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
+        #bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
         name = input("Enter Object Name: ")
         print(name)
         
