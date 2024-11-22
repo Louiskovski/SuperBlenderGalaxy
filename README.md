@@ -49,13 +49,13 @@ In Blender, each scenario is divided into scenes. To edit scenario settings, go 
 
 To export Scenariodata to your filesystem, click on **Export Scenario Info** in the Mario Galaxy Map Tools tab.
 
-### Galaxy Level Engine Note
-Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngine) scenarios is also supported, but the export is unfinished!
-
 **Zone Layer Display**
 Select a zone's collection in the outliner to display which layers should be visible. If the zone does not have an entry in the scenario yet, a buttom appears that will do the job.
 
 Like Star Mask, its just displayed as a hash number as of this version, so get [this tool](https://kuribo64.net/get.php?id=0WxWiGQe9elhns2b) to get the correct values.
+
+### Galaxy Level Engine Note
+Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngine) scenarios is also supported, but the export is unfinished!
 
 ## Editing
 
@@ -96,8 +96,11 @@ To use loadable model assets in the editor, you must put your 3D model into a co
 ![screenshot](pictureA.png)
 
 If you now add an object with the same name, or import a zone/galaxy that contains this object name, the 3D model will now be visible when:
+
 -The asset is in the same blend file as the level
+
 or
+
 -The blend file with the asset is in the folder structure that was entered in *paths* under *Mario Galaxy - Map Tools*
 
 #### Blender's Asset Browser
