@@ -65,7 +65,7 @@ Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngi
 ## Editing
 
 ### Adding objects
-Be sure that Blender's command line window is open (*Window -> Toggle System Console). As of this version it is required to enter object names in this window.
+Be sure that Blender's command line window is open (*Window -> Toggle System Console*). As of this version it is required to enter object names in this window.
 
 To add objects, be sure that you selected the zone's collection, which you want to add your object, and click on **Add Galaxy Object** to add an object of your likeling. If Asset Searching is enabled, the plugin searches for assets in a given folder structure using your entered object name in Blender files and links them. More about this at **Asset Usage**.
 
