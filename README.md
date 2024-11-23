@@ -1,6 +1,6 @@
 # Mario Galaxy Map Editor / Converter Addon for Blender
 Transforms Blender into a Mario Galaxy Level Editor.
-Still pretty WIP. Make backups of your levels.
+Still pretty WIP. Make backups of your levels. Updates come regularly.
 
 # Preparation
 
@@ -12,6 +12,10 @@ Still pretty WIP. Make backups of your levels.
 
 Now start Blender and install the addon
 - In the 3D View on the right click on the *Mario Galaxy* tab and enter the required paths at the *path* column
+
+## Dolphin Note
+
+You can edit and even export the level while the game is running in the Dolphin emulator. To get the level changes ingame, exit and re-enter the level.
 
 # Importing Levels
 
