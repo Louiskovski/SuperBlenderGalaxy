@@ -1,5 +1,6 @@
 # Mario Galaxy Map Editor / Converter Addon for Blender
-Transforms Blender into a Mario Galaxy Level Editor.
+Transforms Blender into a Mario Galaxy Level Editor, taking full advantage of its asset functionality and controls.
+
 Still pretty WIP. Make backups of your levels. Updates come regularly.
 
 # Preparation
@@ -64,6 +65,8 @@ Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngi
 ## Editing
 
 ### Adding objects
+Be sure that Blender's command line window is open (*Window -> Toggle System Console). As of this version it is required to enter object names in this window.
+
 To add objects, be sure that you selected the zone's collection, which you want to add your object, and click on **Add Galaxy Object** to add an object of your likeling. If Asset Searching is enabled, the plugin searches for assets in a given folder structure using your entered object name in Blender files and links them. More about this at **Asset Usage**.
 
 Once a type is selected, Blender will probably freeze briefly. If this is the case, an object name must be entered. Go to Blender's Command Line window and enter your object name. (Sorry, I don't understand how to do this with Blender's UI :P, Will probably be replaced later anyway with a selection from the ObjectDatabase) 
@@ -93,6 +96,10 @@ Each object, except paths, has an Layer field to control, in which scenario it i
 
 Select a zone's collection and click on **Start Camera Editor** in the *Mario Galaxy- Map Tools* tab. Be sure that you entered LaunchCamPlus' folder path unter *paths*.
 
+You can continue editing your level while the camera editor is open. To save the camera settings, go to *File -> Save* or press *CTRL + S* in the camera editor program.
+
+**Tipp:** [This Blender addon](https://github.com/Louiskovski/SuperMarioGalaxy_BlenderCameraPlugin) can be used in combination with SuperBlenderGalaxy. The rotations and camera positions then correspond exactly to the level. Just be sure that the camera objects created by this plugin are not in some level's category collection (i.e. “Objects” or “Cameras”) within a zone, but you can put them in the main collection (e.g. StartZone).
+
 ### Asset Usage
 
 To use loadable model assets in the editor, you must put your 3D model into a collection and give this collection the object name to be used. If your model contains additional things that should not be visible in the editor, such as collision, deactivate the visibility in the viewport of the model/collection (via the monitor icon). Then right-click on the collection and click on **Mark As Asset**.
@@ -101,11 +108,11 @@ To use loadable model assets in the editor, you must put your 3D model into a co
 
 If you now add an object with the same name, or import a zone/galaxy that contains this object name, the 3D model will now be visible when:
 
--The asset is in the same blend file as the level
+- The asset is in the same blend file as the level
 
 or
 
--The blend file with the asset is in the folder structure that was entered in *paths* under *Mario Galaxy - Map Tools*
+- The blend file with the asset is in the folder structure that was entered in *paths* under *Mario Galaxy - Map Tools*
 
 #### Blender's Asset Browser
 
