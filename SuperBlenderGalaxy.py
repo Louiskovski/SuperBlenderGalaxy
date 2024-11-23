@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Mario Galaxy Map Editor / Converter",
     "author": "Louis Miles",
-    "version": (0, 5, 1),
+    "version": (0, 5, 2),
     "blender": (3, 3, 2),
     "location": "In 3D Viewport right under 'Mario Galaxy'",
     "description": "Transforms Blender into a Mario Galaxy Level Editor",
@@ -536,7 +536,7 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    I_id = row['l_id:Int:0']
+                    I_id = int(row['l_id:Int:0'])
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
                     pos_z = float(row['pos_y:Float:0.0'])       # Yoben ist in Blender Zoben
@@ -845,7 +845,7 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     #scale_x = float(row[8])
                     #scale_y = float(row[10]) #*-1
                     #scale_z = float(row[9])
-                    Obj_ID = row['Obj_ID:Short:0']     
+                    Obj_ID = int(row['Obj_ID:Short:0'])  
             
                     dir_x = dir_x * math.pi/180  #grad zu radians, fuer Blender
                     dir_y = dir_y * math.pi/180
@@ -891,31 +891,31 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    I_id = row['l_id:Int:0']
-                    MoveConditionType = row['MoveConditionType:Int:0']
-                    RotateSpeed = row['RotateSpeed:Int:0']
-                    RotateAngle = row['RotateAngle:Int:0']
-                    RotateAxis = row['RotateAxis:Int:0']                
-                    RotateAccelType = row['RotateAccelType:Int:0']                
-                    RotateStopTime = row['RotateStopTime:Int:0']                
-                    RotateType = row['RotateType:Int:0']  
-                    ShadowType = row['ShadowType:Int:0']  
-                    SignMotionType = row['SignMotionType:Int:0']  
-                    PressType = row['PressType:Int:0']  
-                    ParamScale = row['ParamScale:Float:0.0'] 
-                    CameraSetId = row['CameraSetId:Int:0']
-                    FarClip = row['FarClip:Int:0']            
-                    Obj_arg0 = row['Obj_arg0:Int:0']
-                    Obj_arg1 = row['Obj_arg1:Int:0']
-                    Obj_arg2 = row['Obj_arg2:Int:0']
-                    Obj_arg3 = row['Obj_arg3:Int:0']
+                    I_id = int(row['l_id:Int:0'])
+                    MoveConditionType = int(row['MoveConditionType:Int:0'])
+                    RotateSpeed = int(row['RotateSpeed:Int:0'])
+                    RotateAngle = int(row['RotateAngle:Int:0'])
+                    RotateAxis = int(row['RotateAxis:Int:0'])                
+                    RotateAccelType = int(row['RotateAccelType:Int:0'])                
+                    RotateStopTime = int(row['RotateStopTime:Int:0'])                
+                    RotateType = int(row['RotateType:Int:0'])  
+                    ShadowType = int(row['ShadowType:Int:0'])  
+                    SignMotionType = int(row['SignMotionType:Int:0'])  
+                    PressType = int(row['PressType:Int:0'])  
+                    ParamScale = float(row['ParamScale:Float:0.0']) 
+                    CameraSetId = int(row['CameraSetId:Int:0'])
+                    FarClip = int(row['FarClip:Int:0']    )        
+                    Obj_arg0 = int(row['Obj_arg0:Int:0'])
+                    Obj_arg1 = int(row['Obj_arg1:Int:0'])
+                    Obj_arg2 = int(row['Obj_arg2:Int:0'])
+                    Obj_arg3 = int(row['Obj_arg3:Int:0'])
 
-                    SW_APPEAR = row['SW_APPEAR:Int:0']
-                    SW_DEAD = row['SW_DEAD:Int:0']
-                    SW_A = row['SW_A:Int:0']
-                    SW_B = row['SW_B:Int:0']
-                    SW_AWAKE = row['SW_AWAKE:Int:0']
-                    SW_PARAM = row['SW_PARAM:Int:0']
+                    SW_APPEAR = int(row['SW_APPEAR:Int:0'])
+                    SW_DEAD = int(row['SW_DEAD:Int:0'])
+                    SW_A = int(row['SW_A:Int:0'])
+                    SW_B = int(row['SW_B:Int:0'])
+                    SW_AWAKE = int(row['SW_AWAKE:Int:0'])
+                    SW_PARAM = int(row['SW_PARAM:Int:0'])
 
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
@@ -927,16 +927,16 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     scale_y = float(row['scale_z:Float:0.0'])# *-1
                     scale_z = float(row['scale_y:Float:0.0'])
                     
-                    CastId = row['CastId:Int:0']
-                    ViewGroupId = row['ViewGroupId:Int:0']
-                    ShapeModelNo = row['ShapeModelNo:Short:0']
-                    CommonPath_ID = row['CommonPath_ID:Short:0']
-                    ClippingGroupId = row['ClippingGroupId:Short:0']
-                    GroupId = row['GroupId:Short:0']
-                    DemoGroupId = row['DemoGroupId:Short:0']
-                    MapParts_ID = row['MapParts_ID:Short:0']
-                    Obj_ID = row['Obj_ID:Short:0']
-                    ParentId = row['ParentId:Short:0']       
+                    CastId = int(row['CastId:Int:0'])
+                    ViewGroupId = int(row['ViewGroupId:Int:0'])
+                    ShapeModelNo = int(row['ShapeModelNo:Short:0'])
+                    CommonPath_ID = int(row['CommonPath_ID:Short:0'])
+                    ClippingGroupId = int(row['ClippingGroupId:Short:0'])
+                    GroupId = int(row['GroupId:Short:0'])
+                    DemoGroupId = int(row['DemoGroupId:Short:0'])
+                    MapParts_ID = int(row['MapParts_ID:Short:0'])
+                    Obj_ID = int(row['Obj_ID:Short:0'])
+                    ParentId = int(row['ParentId:Short:0'])    
             
                     dir_x = dir_x * math.pi/180  #grad zu radians, fuer Blender
                     dir_y = dir_y * math.pi/180
@@ -1080,20 +1080,20 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    I_id = row['l_id:Int:0']
-                    Obj_arg0 = row['Obj_arg0:Int:0']
-                    Obj_arg1 = row['Obj_arg1:Int:0']
-                    Obj_arg2 = row['Obj_arg2:Int:0']
-                    Obj_arg3 = row['Obj_arg3:Int:0']
-                    Obj_arg4 = row['Obj_arg4:Int:0']
-                    Obj_arg5 = row['Obj_arg5:Int:0']
-                    Obj_arg6 = row['Obj_arg6:Int:0']
-                    Obj_arg7 = row['Obj_arg7:Int:0']
-                    Priority = row['Priority:Int:0']
-                    SW_APPEAR = row['SW_APPEAR:Int:0']
-                    SW_A = row['SW_A:Int:0']
-                    SW_B = row['SW_B:Int:0']
-                    SW_AWAKE = row['SW_AWAKE:Int:0']
+                    I_id = int(row['l_id:Int:0'])
+                    Obj_arg0 = int(row['Obj_arg0:Int:0'])
+                    Obj_arg1 = int(row['Obj_arg1:Int:0'])
+                    Obj_arg2 = int(row['Obj_arg2:Int:0'])
+                    Obj_arg3 = int(row['Obj_arg3:Int:0'])
+                    Obj_arg4 = int(row['Obj_arg4:Int:0'])
+                    Obj_arg5 = int(row['Obj_arg5:Int:0'])
+                    Obj_arg6 = int(row['Obj_arg6:Int:0'])
+                    Obj_arg7 = int(row['Obj_arg7:Int:0'])
+                    Priority = int(row['Priority:Int:0'])
+                    SW_APPEAR = int(row['SW_APPEAR:Int:0'])
+                    SW_A = int(row['SW_A:Int:0'])
+                    SW_B = int(row['SW_B:Int:0'])
+                    SW_AWAKE = int(row['SW_AWAKE:Int:0'])
                     
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
@@ -1105,14 +1105,14 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     scale_y = float(row['scale_z:Float:0.0']) #*-1
                     scale_z = float(row['scale_y:Float:0.0'])
                     
-                    FollowId = row['FollowId:Int:0']
-                    AreaShapeNo = row['AreaShapeNo:Short:0']
-                    CommonPath_ID = row['CommonPath_ID:Short:0']
-                    ClippingGroupId = row['ClippingGroupId:Short:0']
-                    GroupId = row['GroupId:Short:0']
-                    DemoGroupId = row['DemoGroupId:Short:0']
-                    MapParts_ID = row['MapParts_ID:Short:0']
-                    Obj_ID = row['Obj_ID:Short:0']    
+                    FollowId = int(row['FollowId:Int:0'])
+                    AreaShapeNo = int(row['AreaShapeNo:Short:0'])
+                    CommonPath_ID = int(row['CommonPath_ID:Short:0'])
+                    ClippingGroupId = int(row['ClippingGroupId:Short:0'])
+                    GroupId = int(row['GroupId:Short:0'])
+                    DemoGroupId = int(row['DemoGroupId:Short:0'])
+                    MapParts_ID = int(row['MapParts_ID:Short:0'])
+                    Obj_ID = int(row['Obj_ID:Short:0'])
             
                     dir_x = dir_x * math.pi/180  #grad zu radians, fuer Blender
                     dir_y = dir_y * math.pi/180
@@ -1247,17 +1247,17 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    I_id = row['l_id:Int:0']
-                    Obj_arg0 = row['Obj_arg0:Int:0']
-                    Obj_arg1 = row['Obj_arg1:Int:0']
-                    Obj_arg2 = row['Obj_arg2:Int:0']
-                    Obj_arg3 = row['Obj_arg3:Int:0']
-                    InterpolateIn = row['InterpolateIn:Int:0'] #eh unused
-                    InterpolateOut = row['InterpolateOut:Int:0'] #
-                    SW_APPEAR = row['SW_APPEAR:Int:0']
-                    SW_A = row['SW_A:Int:0']
-                    SW_B = row['SW_B:Int:0']
-                    SW_AWAKE = row['SW_AWAKE:Int:0']
+                    I_id = int(row['l_id:Int:0'])
+                    Obj_arg0 = int(row['Obj_arg0:Int:0'])
+                    Obj_arg1 = int(row['Obj_arg1:Int:0'])
+                    Obj_arg2 = int(row['Obj_arg2:Int:0'])
+                    Obj_arg3 = int(row['Obj_arg3:Int:0'])
+                    InterpolateIn = int(row['InterpolateIn:Int:0']) #eh unused
+                    InterpolateOut = int(row['InterpolateOut:Int:0']) #
+                    SW_APPEAR = int(row['SW_APPEAR:Int:0'])
+                    SW_A = int(row['SW_A:Int:0'])
+                    SW_B = int(row['SW_B:Int:0'])
+                    SW_AWAKE = int(row['SW_AWAKE:Int:0'])
                     Validity = row['Validity:String:0'] #was ist das
                     
                     pos_x = float(row['pos_x:Float:0.0'])
@@ -1270,10 +1270,10 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     scale_y = float(row['scale_z:Float:0.0']) #*-1
                     scale_z = float(row['scale_y:Float:0.0'])
                     
-                    FollowId = row['FollowId:Int:0']
-                    AreaShapeNo = row['AreaShapeNo:Short:0']
-                    MapParts_ID = row['MapParts_ID:Short:0']
-                    Obj_ID = row['Obj_ID:Short:0']    
+                    FollowId = int(row['FollowId:Int:0'])
+                    AreaShapeNo = int(row['AreaShapeNo:Short:0'])
+                    MapParts_ID = int(row['MapParts_ID:Short:0'])
+                    Obj_ID = int(row['Obj_ID:Short:0']) 
             
                     dir_x = dir_x * math.pi/180  #grad zu radians, fuer Blender
                     dir_y = dir_y * math.pi/180
@@ -1381,12 +1381,12 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     name = row['name:String:0']
                     DemoName = row['DemoName:String:0']
                     TimeSheetName = row['TimeSheetName:String:0']
-                    I_id = row['l_id:Int:0']
-                    SW_APPEAR = row['SW_APPEAR:Int:0']
-                    SW_DEAD = row['SW_DEAD:Int:0']
-                    SW_A = row['SW_A:Int:0']
-                    SW_B = row['SW_B:Int:0']
-                    DemoSkip = row['DemoSkip:Int:0']
+                    I_id = int(row['l_id:Int:0'])
+                    SW_APPEAR = int(row['SW_APPEAR:Int:0'])
+                    SW_DEAD = int(row['SW_DEAD:Int:0'])
+                    SW_A = int(row['SW_A:Int:0'])
+                    SW_B = int(row['SW_B:Int:0'])
+                    DemoSkip = int(row['DemoSkip:Int:0'])
                     
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
@@ -1457,24 +1457,24 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    I_id = row['l_id:Int:0']
-                    obj_arg0 = row['Obj_arg0:Int:0']
-                    obj_arg1 = row['Obj_arg1:Int:0']
-                    obj_arg2 = row['Obj_arg2:Int:0']
-                    obj_arg3 = row['Obj_arg3:Int:0']
-                    obj_arg4 = row['Obj_arg4:Int:0']
-                    obj_arg5 = row['Obj_arg5:Int:0']
-                    obj_arg6 = row['Obj_arg6:Int:0']
-                    obj_arg7 = row['Obj_arg7:Int:0']
-                    CameraSetId = row['CameraSetId:Int:0']
-                    SW_APPEAR = row['SW_APPEAR:Int:0']
-                    SW_DEAD = row['SW_DEAD:Int:0']
-                    SW_A = row['SW_A:Int:0']
-                    SW_B = row['SW_B:Int:0']
-                    SW_AWAKE = row['SW_AWAKE:Int:0']
-                    SW_PARAM = row['SW_PARAM:Int:0']
-                    MessageId = row['MessageId:Int:0']
-                    ParamScale = row['ParamScale:Float:0.0']
+                    I_id = int(row['l_id:Int:0'])
+                    obj_arg0 = int(row['Obj_arg0:Int:0'])
+                    obj_arg1 = int(row['Obj_arg1:Int:0'])
+                    obj_arg2 = int(row['Obj_arg2:Int:0'])
+                    obj_arg3 = int(row['Obj_arg3:Int:0'])
+                    obj_arg4 = int(row['Obj_arg4:Int:0'])
+                    obj_arg5 = int(row['Obj_arg5:Int:0'])
+                    obj_arg6 = int(row['Obj_arg6:Int:0'])
+                    obj_arg7 = int(row['Obj_arg7:Int:0'])
+                    CameraSetId = int(row['CameraSetId:Int:0'])
+                    SW_APPEAR = int(row['SW_APPEAR:Int:0'])
+                    SW_DEAD = int(row['SW_DEAD:Int:0'])
+                    SW_A = int(row['SW_A:Int:0'])
+                    SW_B = int(row['SW_B:Int:0'])
+                    SW_AWAKE = int(row['SW_AWAKE:Int:0'])
+                    SW_PARAM = int(row['SW_PARAM:Int:0'])
+                    MessageId = int(row['MessageId:Int:0'])
+                    ParamScale = float(row['ParamScale:Float:0.0'])
                     
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
@@ -1486,16 +1486,16 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     scale_y = float(row['scale_z:Float:0.0']) #*-1
                     scale_z = float(row['scale_y:Float:0.0'])
                     
-                    CastId = row['CastId:Int:0']
-                    ViewGroupId = row['ViewGroupId:Int:0']
-                    ShapeModelNo = row['ShapeModelNo:Short:0']
-                    CommonPath_ID = row['CommonPath_ID:Short:0']
-                    ClippingGroupId = row['ClippingGroupId:Short:0']
-                    GroupId = row['GroupId:Short:0']
-                    DemoGroupId = row['DemoGroupId:Short:0']
-                    MapParts_ID = row['MapParts_ID:Short:0']
-                    Obj_ID = row['Obj_ID:Short:0']
-                    GeneratorID = row['GeneratorID:Short:0']       
+                    CastId = int(row['CastId:Int:0'])
+                    ViewGroupId = int(row['ViewGroupId:Int:0'])
+                    ShapeModelNo = int(row['ShapeModelNo:Short:0'])
+                    CommonPath_ID = int(row['CommonPath_ID:Short:0'])
+                    ClippingGroupId = int(row['ClippingGroupId:Short:0'])
+                    GroupId = int(row['GroupId:Short:0'])
+                    DemoGroupId = int(row['DemoGroupId:Short:0'])
+                    MapParts_ID = int(row['MapParts_ID:Short:0'])
+                    Obj_ID = int(row['Obj_ID:Short:0'])
+                    GeneratorID = int(row['GeneratorID:Short:0'])
             
                     dir_x = dir_x * math.pi/180  #grad zu radians, fuer Blender
                     dir_y = dir_y * math.pi/180
@@ -1635,22 +1635,22 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    I_id = row['l_id:Int:0']
-                    Obj_arg0 = row['Obj_arg0:Int:0']
-                    Obj_arg1 = row['Obj_arg1:Int:0']
-                    Obj_arg2 = row['Obj_arg2:Int:0']
-                    Obj_arg3 = row['Obj_arg3:Int:0']
-                    Range = row['Range:Float:0.0']
-                    Distant = row['Distant:Float:0.0']
-                    Priority = row['Priority:Int:0']
-                    Inverse = row['Inverse:Int:0']
+                    I_id = int(row['l_id:Int:0'])
+                    Obj_arg0 = int(row['Obj_arg0:Int:0'])
+                    Obj_arg1 = int(row['Obj_arg1:Int:0'])
+                    Obj_arg2 = int(row['Obj_arg2:Int:0'])
+                    Obj_arg3 = int(row['Obj_arg3:Int:0'])
+                    Range = float(row['Range:Float:0.0'])
+                    Distant = float(row['Distant:Float:0.0'])
+                    Priority = int(row['Priority:Int:0'])
+                    Inverse = int(row['Inverse:Int:0'])
                     Power = row['Power:String:0']
                     Gravity_type = row['Gravity_type:String:0'] #ACHTUNG, das ist nur dieses Heavy dings. Objektname definiert den Typ
-                    SW_APPEAR = row['SW_APPEAR:Int:0']
-                    SW_DEAD = row['SW_DEAD:Int:0']
-                    SW_A = row['SW_A:Int:0']
-                    SW_B = row['SW_B:Int:0']
-                    SW_AWAKE = row['SW_AWAKE:Int:0']
+                    SW_APPEAR = int(row['SW_APPEAR:Int:0'])
+                    SW_DEAD = int(row['SW_DEAD:Int:0'])
+                    SW_A = int(row['SW_A:Int:0'])
+                    SW_B = int(row['SW_B:Int:0'])
+                    SW_AWAKE = int(row['SW_AWAKE:Int:0'])
                     
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
@@ -1662,13 +1662,13 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     scale_y = float(row['scale_z:Float:0.0'])# *-1
                     scale_z = float(row['scale_y:Float:0.0'])
                     
-                    FollowId = row['FollowId:Int:0']
-                    CommonPath_ID = row['CommonPath_ID:Short:0']
-                    ClippingGroupId = row['ClippingGroupId:Short:0']
-                    GroupId = row['GroupId:Short:0']
-                    DemoGroupId = row['DemoGroupId:Short:0']
-                    MapParts_ID = row['MapParts_ID:Short:0']
-                    Obj_ID = row['Obj_ID:Short:0']       
+                    FollowId = int(row['FollowId:Int:0'])
+                    CommonPath_ID = int(row['CommonPath_ID:Short:0'])
+                    ClippingGroupId = int(row['ClippingGroupId:Short:0'])
+                    GroupId = int(row['GroupId:Short:0'])
+                    DemoGroupId = int(row['DemoGroupId:Short:0'])
+                    MapParts_ID = int(row['MapParts_ID:Short:0'])
+                    Obj_ID = int(row['Obj_ID:Short:0'])
             
                     dir_x = dir_x * math.pi/180  #grad zu radians, fuer Blender
                     dir_y = dir_y * math.pi/180
@@ -1881,7 +1881,7 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    I_id = row['l_id:Int:0']
+                    I_id = int(row['l_id:Int:0'])
                     
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
@@ -1941,9 +1941,9 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 for row in reader:
                     
                     name = row['name:String:0']
-                    MarioNo = row['MarioNo:Int:0']
-                    obj_arg0 = row['Obj_arg0:Int:0']
-                    Camera_id = row['Camera_id:Int:0']
+                    MarioNo = int(row['MarioNo:Int:0'])
+                    obj_arg0 = int(row['Obj_arg0:Int:0'])
+                    Camera_id = int(row['Camera_id:Int:0'])
                     
                     pos_x = float(row['pos_x:Float:0.0'])
                     pos_y = float(row['pos_z:Float:0.0']) *-1
@@ -2012,14 +2012,14 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                 closed = row[2]
                 #num_pnt = row[3] #brauchts nicht. Les es vom Path selbst
                 l_id = row[4] #WICHTIG. Das ist die ID. Start ist immer 0. 'no' muss auch identisch sein
-                path_arg0 = row[5]
-                path_arg1 = row[6]
-                path_arg2 = row[7]
-                path_arg3 = row[8]
-                path_arg4 = row[9]
-                path_arg5 = row[10]
-                path_arg6 = row[11]
-                path_arg7 = row[12]
+                path_arg0 = int(row[5])
+                path_arg1 = int(row[6])
+                path_arg2 = int(row[7])
+                path_arg3 = int(row[8])
+                path_arg4 = int(row[9])
+                path_arg5 = int(row[10])
+                path_arg6 = int(row[11])
+                path_arg7 = int(row[12])
                 usage = row[13]
                 no = row[14]  #WICHTIG. Das ist die ID. Start ist immer 0
                 #Path_ID = row[15] #Ist immer -1. pfeif drauf
@@ -6505,7 +6505,7 @@ def GalaxyMapChangeAreaShape(AreaShapeNo):
 class GalaxyMapAddPathPointSetup(bpy.types.Operator): 
    """Add Path Point Setup to selected path"""
    bl_idname = "galaxymap77.galaxyaddpathsetup" 
-   bl_label = "Path" 
+   bl_label = "Add Path Point Setup" 
    def execute(self, context):
         AssetSearch = bpy.context.workspace["Asset Searching Enabled"]
         BlendFilesFolder = bpy.context.workspace["Workspace (for searching in Blend files)"]
@@ -6706,7 +6706,7 @@ class GalaxyMapOperator13(bpy.types.Operator): #nur zum starten vom layout
 class GalaxyMap_LayoutStarter2(bpy.types.Operator): #nur zum starten vom layout
     """Add Object"""
     bl_idname = "galaxymaplayout2.layoutstarter2"
-    bl_label = "Add Galaxy Object" 
+    bl_label = "Add Gravity" 
     def execute(self, context):
         bpy.ops.wm.call_menu(name=LayoutSMGMap_AddGravityPanel.bl_idname)
         return {'FINISHED'}
@@ -7631,6 +7631,14 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_9"]', text="Path ID")
+            
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_10"]', text="Shape (Only planar)")
+            
+            row = layout.row()
+            row.scale_y = 1.2
+            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_11"]', text="Zero Gravity? (Only planar)")
             
             layout.label(text="Arguments")
             row = layout.row()
