@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Mario Galaxy Map Editor / Converter",
     "author": "Louis Miles",
-    "version": (0, 5, 2),
+    "version": (0, 5, 3),
     "blender": (3, 3, 2),
     "location": "In 3D Viewport right under 'Mario Galaxy'",
     "description": "Transforms Blender into a Mario Galaxy Level Editor",
@@ -1106,7 +1106,7 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     scale_z = float(row['scale_y:Float:0.0'])
                     
                     FollowId = int(row['FollowId:Int:0'])
-                    AreaShapeNo = int(row['AreaShapeNo:Short:0'])
+                    AreaShapeNo = str(row['AreaShapeNo:Short:0'])
                     CommonPath_ID = int(row['CommonPath_ID:Short:0'])
                     ClippingGroupId = int(row['ClippingGroupId:Short:0'])
                     GroupId = int(row['GroupId:Short:0'])
@@ -1271,7 +1271,7 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     scale_z = float(row['scale_y:Float:0.0'])
                     
                     FollowId = int(row['FollowId:Int:0'])
-                    AreaShapeNo = int(row['AreaShapeNo:Short:0'])
+                    AreaShapeNo = str(row['AreaShapeNo:Short:0'])
                     MapParts_ID = int(row['MapParts_ID:Short:0'])
                     Obj_ID = int(row['Obj_ID:Short:0']) 
             
