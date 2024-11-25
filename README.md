@@ -121,6 +121,12 @@ Your asset is then of course also in Blender's Asset Browser and you can drag it
 You also need to be sure that the object is in the correct category in the outliner. The Asset Browser will only add it to the currently selected collection!
 
 
+# Plans for future versions
 
+- ObjectDatabase usage by Asset Browser (object names, info, argument/variable usage)
+- Improve Pymap usage, such as not converting CSV <-> BCSV, and instead read and write BCSV directly (to make importing and exporting much faster)
+- Replace WiiExplorer with PyKernel to directly read/write the ARC archives instead of extracting them to folders and then packing them (to avoid useless extra folders)
+- Render BDL/BMD model (good luck with that :P)
+- Or a way to extract all original assets to DAE/FBX, and then use them in the Blender Editor for assets (like The Fourth Dimension, the 3D Land Editor does)
 
 
