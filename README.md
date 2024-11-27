@@ -1,4 +1,7 @@
 # Mario Galaxy Map Editor / Converter Addon for Blender
+
+![screenshot](pictureC.png)
+
 Transforms Blender into a Mario Galaxy Level Editor, taking full advantage of its asset functionality and controls.
 
 Still pretty WIP. Make backups of your levels. Updates come regularly.
@@ -116,10 +119,20 @@ or
 
 #### Blender's Asset Browser
 
-Your asset is then of course also in Blender's Asset Browser and you can drag it from there into your level. The disadvantage (so far), however, is that it does not automatically contain the required properties. Click on **Add properties to selected asset (collection)** under *Mario Galaxy - Map Tools* and select either **General Object** or **Map Parts Object** to add the required parameters.
+Your asset is then of course also in Blender's Asset Browser and you can drag it from there into your level. Be sure that you have it set to Link and not Append, otherwise it will copy the model instead of referencing it.
+
+The disadvantage (so far), however, is that it does not automatically contain the required properties. Click on **Add properties to selected asset (collection)** under *Mario Galaxy - Map Tools* and select either **General Object** or **Map Parts Object** to add the required parameters.
 
 You also need to be sure that the object is in the correct category in the outliner. The Asset Browser will only add it to the currently selected collection!
 
+#### Getting original Assets to display
+
+You can extract all assets to OBJ in order to display in the editor.
+
+Download this zip, unzip it and follow the instructions in the ReadMe:
+https://kuribo64.net/get.php?id=qJN11czWftV9nDvR
+
+This can take about 10 minutes however.
 
 # Plans for future versions
 
