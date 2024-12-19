@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Mario Galaxy Map Editor / Converter",
     "author": "Louis Miles",
-    "version": (0, 5, 3),
+    "version": (0, 5, 4),
     "blender": (3, 3, 2),
     "location": "In 3D Viewport right under 'Mario Galaxy'",
     "description": "Transforms Blender into a Mario Galaxy Level Editor",
@@ -3975,13 +3975,6 @@ def Export(GalaxyMapName, ZoneID):
 
 
 
-    # Alphabetische Sortierung deaktivieren, da dies zu fehlerhaftem Export fuhren kann
-    for area in bpy.context.window.screen.areas:
-        if area.type == 'OUTLINER':
-            for space in area.spaces:
-                if space.type == 'OUTLINER':
-                    if space.use_sort_alpha == True:
-                        space.use_sort_alpha = False
 
     C = bpy.context
 
@@ -4030,7 +4023,7 @@ def Export(GalaxyMapName, ZoneID):
             closed = "CLOSE"
             
         num_pnt = len(TheBez_points[:])
-        l_id = obj.data.name                                   ############# TODO: ZonePrefix entfernen ##############
+        l_id = obj.data.name
         l_id = l_id.replace(ZonePrefix, '')  #Zonen Prefix entfernen
         path_arg0 = (obj["PathArg0 (Posture Type)"])
         path_arg1 = (obj["PathArg1 (Stop Motion Type)"])
@@ -4054,6 +4047,22 @@ def Export(GalaxyMapName, ZoneID):
         print(OBJEKTCODE) #Debug
         
     blenderCipher.close() #CSV Datei schliessen
+    
+    ### Path Liste anhand der IDs sortieren, damit die Reihenfolge stimmt
+    file_name = bpy.path.abspath('//05_MapExport\\')+MapName+'\\stage\\jmp\\Path\\CommonPathInfo'
+    with open(file_name, mode='r') as file:
+        reader = csv.reader(file)
+        header = next(reader)
+        data = list(reader)
+
+    # Sortieren nach der 5. Spalte (Path Id)
+    data.sort(key=lambda row: int(row[4]))
+
+    with open(file_name, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        writer.writerows(data)
+
 
 
     ######### PATH POINTS ########
