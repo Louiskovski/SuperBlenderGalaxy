@@ -560,6 +560,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object.scale[1] = scale_y
                     bpy.context.object.scale[2] = scale_z
                     
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+                    
                     bpy.context.view_layer.objects.active.name = name
                     bpy.context.object["Object Name"] = name
                     bpy.context.object["Link ID"] = I_id
@@ -860,6 +862,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object["Linked Object ID"] = Obj_ID
                     bpy.context.object["Position Name"] = PosName
                     
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+                    
                     bpy.context.object["Layer"] = LAYERname
                     
                     obj = bpy.context.active_object # our created cube is the active one
@@ -950,6 +954,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object.scale[0] = scale_x
                     bpy.context.object.scale[1] = scale_y
                     bpy.context.object.scale[2] = scale_z
+                    
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
                     
                     bpy.context.view_layer.objects.active.name = name
                     bpy.context.object["Object Name"] = name
@@ -1128,6 +1134,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object.scale[2] = scale_z
                     #bpy.context.object.instance_type = 'COLLECTION'
                     
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+                    
                     bpy.context.view_layer.objects.active.name = name
                     bpy.context.object["Object Name"] = name
                     bpy.context.object["Link ID"] = I_id
@@ -1289,6 +1297,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object.scale[2] = scale_z
                     bpy.context.object.instance_type = 'COLLECTION'
 
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+
                     bpy.context.view_layer.objects.active.name = name
                     bpy.context.object["Object Name"] = name
                     bpy.context.object["Link ID"] = I_id
@@ -1411,6 +1421,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object.scale[1] = scale_y
                     bpy.context.object.scale[2] = scale_z
                     
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+                    
                     bpy.context.view_layer.objects.active.name = name
                     bpy.context.object["Object Name"] = name
                     
@@ -1509,6 +1521,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object.scale[0] = scale_x
                     bpy.context.object.scale[1] = scale_y
                     bpy.context.object.scale[2] = scale_z
+                    
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
                     
                     bpy.context.view_layer.objects.active.name = name
                     bpy.context.object["Object Name"] = name
@@ -1682,6 +1696,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     #bpy.context.object.scale[0] = scale_x
                     #bpy.context.object.scale[1] = scale_y
                     #bpy.context.object.scale[2] = scale_z
+                    
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
                     
                     bpy.context.view_layer.objects.active.name = name
                     
@@ -1898,6 +1914,9 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     print(name)
                     print()
                     bpy.ops.object.empty_add(type='PLAIN_AXES', radius=100, align='WORLD', location=(pos_x, pos_y, pos_z), scale=(1, 1, 1), rotation=(dir_x, dir_y, dir_z))
+                    
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+                    
                     bpy.context.view_layer.objects.active.name = name
                     bpy.context.object["Object Name"] = name
                     bpy.context.object["Link ID"] = I_id
@@ -1966,6 +1985,9 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.ops.object.empty_add(type='PLAIN_AXES', radius=100, align='WORLD', location=(pos_x, pos_y, pos_z), scale=(scale_x, scale_y, scale_z), rotation=(dir_x, dir_y, dir_z))
                     bpy.context.view_layer.objects.active.name = name
                     #bpy.context.object["Object Name"] = name  #Nee, soll eh immer "Mario" sein
+                    
+                    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+                    
                     bpy.context.object["Spawn ID"] = MarioNo
                     bpy.context.object["Entrance Type"] = obj_arg0
                     bpy.context.object["Camera ID"] = Camera_id
@@ -2198,6 +2220,9 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                         if PointArg0 == True:
                             point_arg0 = curve_data["point_argument0"][i] * math.pi/180  #grad zu radians, fuer Blender
                             bez_points[i].tilt = point_arg0
+                        else:
+                            
+                            bez_points[i].tilt = -1 * math.pi/180
                         
 
                     #Pivot Point zum ersten Punkt schicken:
@@ -3950,6 +3975,14 @@ def Export(GalaxyMapName, ZoneID):
 
 
 
+    # Alphabetische Sortierung deaktivieren, da dies zu fehlerhaftem Export fuhren kann
+    for area in bpy.context.window.screen.areas:
+        if area.type == 'OUTLINER':
+            for space in area.spaces:
+                if space.type == 'OUTLINER':
+                    if space.use_sort_alpha == True:
+                        space.use_sort_alpha = False
+
     C = bpy.context
 
 
@@ -5546,6 +5579,9 @@ class GalaxyMapOperator11(bpy.types.Operator): #Normal Object info apply
         bpy.context.object["Linked Object ID"] = -1
         bpy.context.object["Generator Object ID"] = -1
         bpy.context.object["Layer"] = "Common"
+        
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+        
         return {'FINISHED'}
     
 
@@ -5594,6 +5630,8 @@ class GalaxyMapOperator12(bpy.types.Operator): #MapPart Object info apply
         bpy.context.object["Parent Object ID"] = -1
 
         bpy.context.object["Layer"] = "Common"
+        
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
         return {'FINISHED'}
 
 
@@ -5667,6 +5705,8 @@ class GalaxyMapAddObject(bpy.types.Operator): #ADD Object
         bpy.context.object["Linked Object ID"] = -1
         bpy.context.object["Generator Object ID"] = -1
         bpy.context.object["Layer"] = "Common"
+        
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
         
         if AssetSearch == True:
         
@@ -5795,6 +5835,8 @@ class GalaxyMapAddMapPart(bpy.types.Operator): #ADD MapPart
         bpy.context.object["Parent Object ID"] = -1
 
         bpy.context.object["Layer"] = "Common"
+        
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
         
         if AssetSearch == True:
             ### WIP - Linke Assets von anderen Blender Dateien ###    
@@ -5938,7 +5980,7 @@ def GalaxyMapAddGravity(ObjektName): #ADD Gravity
     bpy.context.object.lock_scale[1] = True
     bpy.context.object.lock_scale[2] = True
 
-    
+    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
     
     Obj_arg0 = -1
     Obj_arg1 = -1
@@ -6070,6 +6112,8 @@ class GalaxyMapAddArea(bpy.types.Operator):
         
         bpy.context.object["Layer"] = "Common"
         
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+        
         ########################################### COLLECTION LINK
         
         try:
@@ -6178,6 +6222,8 @@ class GalaxyMapAddCamera(bpy.types.Operator):
         
         bpy.context.object["Layer"] = "Common"
         
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+        
         ########################################### COLLECTION LINK
         
         try:
@@ -6272,6 +6318,8 @@ class GalaxyMapAddStart(bpy.types.Operator):
                     
         bpy.context.object["Layer"] = "Common"
         
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+        
         if "Zone ID" in bpy.context.collection:
             ZoneID = bpy.context.collection["Zone ID"]
             ZonePrefix = "  (Z" + str(ZoneID) + ")"
@@ -6316,6 +6364,8 @@ def GalaxyMapAddCutscene(name):
     
     bpy.context.object["Layer"] = "Common"
     
+    bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
+    
     if "Zone ID" in bpy.context.collection:
         ZoneID = bpy.context.collection["Zone ID"]
         ZonePrefix = "  (Z" + str(ZoneID) + ")"
@@ -6348,6 +6398,8 @@ class GalaxyMapAddPosition(bpy.types.Operator):
         bpy.context.object["Position Name"] = "Undefined"
                     
         bpy.context.object["Layer"] = "Common"
+        
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
         
         if "Zone ID" in bpy.context.collection:
             ZoneID = bpy.context.collection["Zone ID"]
@@ -6382,6 +6434,8 @@ class GalaxyMapAddDebug(bpy.types.Operator):
         bpy.context.object["Link ID"] = 0
                     
         bpy.context.object["Layer"] = "Common"
+        
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
         
         if "Zone ID" in bpy.context.collection:
             ZoneID = bpy.context.collection["Zone ID"]
@@ -6424,6 +6478,8 @@ class GalaxyMapAddPath(bpy.types.Operator):
         bpy.context.object["PathArg6"] = -1
         bpy.context.object["PathArg7"] = -1
         bpy.context.object["Usage"] = "General"
+        
+        bpy.context.object.rotation_mode = 'XZY' #Richtiger Rotationsmodus
         
         if "Zone ID" in bpy.context.collection:
             ZoneID = bpy.context.collection["Zone ID"]
@@ -7554,7 +7610,9 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             row.scale_y = 1.2
             row.operator("galaxymap77.galaxyaddpathsetup", icon='MOD_LINEART')
             layout.label(text="Point Speed is Mean Tilt")
-            layout.label(text="Point Stop Duration is Mean Weight")
+            layout.label(text="Point Stop Duration is Mean Radius")
+            
+            
 
  #Gravity
         ### Initialize Name Slots for entering names:
