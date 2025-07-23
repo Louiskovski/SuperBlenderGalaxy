@@ -1,8 +1,8 @@
 bl_info = {
     "name": "Mario Galaxy Map Editor / Converter",
     "author": "Louis Miles",
-    "version": (0, 5, 4),
-    "blender": (3, 3, 2),
+    "version": (0, 6, 0),
+    "blender": (4, 4, 0),
     "location": "In 3D Viewport right under 'Mario Galaxy'",
     "description": "Transforms Blender into a Mario Galaxy Level Editor",
     "warning": "Work in Progress!! Make Backups!, No rendering of original Assets, only your assets from your Blend files",
@@ -22,7 +22,9 @@ import sys
 import requests
 import os.path
 
-
+# Database:
+import xml.etree.ElementTree as ET
+from bpy.props import StringProperty, EnumProperty, CollectionProperty
 
 
 ###DEF OPERATORS -----------------------------------------------------
@@ -66,7 +68,12 @@ def ArcPack(GalaxyMapName, WiiExplorerPathFolder, GalaxyFilesystem):
     os.popen(("mkdir ") + (GalaxyFilesystem2 + GalaxyMapName + "\\")).read()
     
     # Dummy ARC mit richtigem Root Namen ins Filesystem stecken
-    ARCtemplate_bytes = b'\x59\x61\x7A\x30\x00\x00\x00\xC0\x00\x00\x00\x00\x00\x00\x00\x00\xFF\x52\x41\x52\x43\x00\x00\x00\xC0\x5A\x10\x03\x20\x10\x07\xA0\x00\x00\x00\x00\x01\x50\x1B\xAE\x02\x10\x27\x40\x50\x27\x80\x00\x02\x20\x16\xFD\x00\x00\x52\x4F\x4F\x54\x20\x33\x35\x9E\xA2\x30\x1F\xF0\x3E\xFF\xFF\x00\x2E\x10\x38\xAB\x06\x50\x57\x10\x50\x13\xB8\x10\x4C\x08\xFF\x1F\x10\x00\x60\x13\x00\x03\x06\x73\x74\x61\x67\x65\xF8\x00\x2E\x00\x2E\x2E\x00\x25\x04'
+    
+    #ARCtemplate_bytes = b'\x59\x61\x7A\x30\x00\x00\x00\xC0\x00\x00\x00\x00\x00\x00\x00\x00\xFF\x52\x41\x52\x43\x00\x00\x00\xC0\x5A\x10\x03\x20\x10\x07\xA0\x00\x00\x00\x00\x01\x50\x1B\xAE\x02\x10\x27\x40\x50\x27\x80\x00\x02\x20\x16\xFD\x00\x00\x52\x4F\x4F\x54\x20\x33\x35\x9E\xA2\x30\x1F\xF0\x3E\xFF\xFF\x00\x2E\x10\x38\xAB\x06\x50\x57\x10\x50\x13\xB8\x10\x4C\x08\xFF\x1F\x10\x00\x60\x13\x00\x03\x06\x73\x74\x61\x67\x65\xF8\x00\x2E\x00\x2E\x2E\x00\x25\x04'
+     
+    # Mit ExportInfo.txt Debug Text, zum Checken der Version und so 
+    ARCtemplate_bytes = b'\x59\x61\x7A\x30\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\xFF\x52\x41\x52\x43\x00\x00\x01\x00\x54\x10\x00\x20\x10\x04\xA0\x10\x08\x40\x50\x03\x60\x02\xA7\x01\x50\x1B\x03\x50\x1B\x20\x27\x80\x00\x03\x7D\x30\x33\x00\x52\x4F\x4F\x54\x20\x3C\x35\x9F\xA2\x30\x1F\x00\x02\x01\x83\x94\x11\x00\x00\xAF\x0B\x50\x4F\x26\x20\x68\xFF\xFF\x00\x2E\xF5\x02\x00\x00\x06\x50\x63\x10\x50\x13\xB8\x63\x10\x13\x08\xFF\x10\x00\x60\x13\x20\x94\x73\x74\xFF\x61\x67\x65\x00\x2E\x00\x2E\x2E\xFF\x00\x45\x78\x70\x6F\x72\x74\x49\xFE\x6E\x66\x6F\x2E\x74\x78\x74\x50\xA0\x7F\x40\x14\x65\x64\x20\x77\x69\x74\x68\xFF\x20\x53\x75\x70\x65\x72\x42\x6C\xFF\x65\x6E\x64\x65\x72\x47\x61\x6C\xFF\x61\x78\x79\x20\x76\x2E\x30\x2E\xC0\x36\x00\x00\x00\x07'
+     
      
     with open(GalaxyFilesystem + GalaxyMapName + "\\" +  MapName + ".arc", "wb") as binary_file:
         # Write bytes to file
@@ -170,7 +177,8 @@ def LayerDisplay(val):
     import struct
     import requests
 
-    LayerMask = bpy.context.scene[val]
+    #LayerMask = bpy.context.scene[val]
+    LayerMask = bpy.context.view_layer[val]
     LayerMask = int(LayerMask)
     print(LayerMask)
 
@@ -1802,44 +1810,44 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
                     bpy.context.object.modifiers["GRAVITY"]["Input_8"][2] = scale_z
                     bpy.context.object.modifiers["GRAVITY"]["Input_8"][1] = scale_y
                     
-                    #Path Zeug WIP:
-                    if not CommonPath_ID == "-1":
-                        #bpy.context.object.modifiers["GRAVITY"]["Input_9"] = "Path 0" #Test. wtf wie soll das gehen #CommonPath_ID
-                        #bpy.context.object.modifiers["GRAVITY"]["Input_9"] = bpy.data.objects["Path 0"] #test
-                        #bpy.context.object.modifiers["GRAVITY"]["Input_9"] = bpy.data.objects.data["Path 0"] #test
+                    # #Path Zeug:
+                    # if not CommonPath_ID == "-1":
+                        # target_curve_name = str(CommonPath_ID) + str(ZonePrefix)
+
+                        # for obj in bpy.data.objects:
+                            # if obj.type == 'CURVE':
+                                # if obj.data.name == target_curve_name:
+                                    # ObjectPathObjName = obj
+                                    # break
                         
-                        #ob = bpy.context.scene.objects["Cube"]
+                            # ObjectPathObjName = ObjectPathObjName.name
                         
-                        ##Vergiss es
-                        
-                        print("bla")
-                        
-                        
+                            # bpy.context.object.modifiers["GRAVITY"]["Input_9"] = bpy.data.objects[ObjectPathObjName]
                         
                     #nur wenn planar:
                     if Gravity_type == "GlobalPlaneGravity":
                         bpy.context.object.modifiers["GRAVITY"]["Input_10"] = 0 #Sphere
-                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = 0
+                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = False #0
                         
                     if Gravity_type == "GlobalPlaneGravityInBox":
                         bpy.context.object.modifiers["GRAVITY"]["Input_10"] = 1 #Cube
-                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = 0
+                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = False #0
                         
                     if Gravity_type == "GlobalPlaneGravityInCylinder":
                         bpy.context.object.modifiers["GRAVITY"]["Input_10"] = 2 #Cylinder
-                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = 0
+                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = False #0
                         
                     if Gravity_type == "ZeroGravitySphere":
                         bpy.context.object.modifiers["GRAVITY"]["Input_10"] = 0 #Sphere
-                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = 1
+                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = True #1
                         
                     if Gravity_type == "ZeroGravityBox":
                         bpy.context.object.modifiers["GRAVITY"]["Input_10"] = 1 #Cube
-                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = 1
+                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = True #1
                         
                     if Gravity_type == "ZeroGravityCylinder":
                         bpy.context.object.modifiers["GRAVITY"]["Input_10"] = 2 #Cylinder
-                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = 1
+                        bpy.context.object.modifiers["GRAVITY"]["Input_11"] = True #1
                     
                     #########################################################
                     
@@ -2227,7 +2235,8 @@ def CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, Bl
 
                     #Pivot Point zum ersten Punkt schicken:
                     bpy.context.scene.tool_settings.use_transform_data_origin = True
-                    bpy.ops.transform.translate(value=(PointX, PointY, PointZ), orient_axis_ortho='X', orient_type='GLOBAL')
+                    #bpy.ops.transform.translate(value=(PointX, PointY, PointZ), orient_axis_ortho='X', orient_type='GLOBAL') #Geht in 4.3.2 nicht mehr
+                    bpy.ops.transform.translate(value=(PointX, PointY, PointZ), orient_type='GLOBAL')
                     bpy.context.scene.tool_settings.use_transform_data_origin = False
                 #ENDE DES POINT LOOPS ##############################
                 #Settings
@@ -2563,6 +2572,7 @@ def Export(GalaxyMapName, ZoneID):
 
     ## Zonenprefix:
     
+    
     ZonePrefix = "  (Z" + str(ZoneID) + ")"
     if ZoneID == 0:
         ZonePrefix = ""
@@ -2882,7 +2892,7 @@ def Export(GalaxyMapName, ZoneID):
         for obj in bpy.data.collections["Debug" + ZonePrefix].all_objects: #Jedes Objekt in csv umwandeln
             if (obj["Layer"]) == LayerName:
 
-                name = (obj["Object Name"]) #Nehme Text aus der 'name' property
+                name = get_base_object_name(obj.name)
                 I_id = (obj["Link ID"])
                 pos_x = (obj.location[0])
                 pos_y = (obj.location[2])
@@ -2936,7 +2946,7 @@ def Export(GalaxyMapName, ZoneID):
         for obj in bpy.data.collections["Positions" + ZonePrefix].all_objects: #Jedes Objekt in csv umwandeln
             if (obj["Layer"]) == LayerName:
 
-                name = (obj["Object Name"])
+                name = get_base_object_name(obj.name)
                 PosName = (obj["Position Name"])
                 pos_x = (obj.location[0])
                 pos_y = (obj.location[2])
@@ -2993,17 +3003,12 @@ def Export(GalaxyMapName, ZoneID):
         for obj in bpy.data.collections["MapParts" + ZonePrefix].all_objects: #Jedes Objekt in csv umwandeln
             if (obj["Layer"]) == LayerName:
 
-                #if obj.instance_type == 'COLLECTION':#Checken, ob das Objekt ne Collection Instanz nutzt
-                #    print("Nutzt Collection Instanz")
-                #    name = (obj.instance_collection.name) #Nehme Namen der Collection als Objektnamen
-                #else:
-                #    print("Nutzt KEINE Collection Instanz")
-                #    name = (obj["Object Name"]) #Nehme also Text aus der 'Object Name' property
+
                 
                     #Checken, ob es Collection Instanz nutzt
                 if obj.instance_collection == None:
-                    print("Nutzt leine Collection Instanz")
-                    name = (obj["Object Name"]) #Nehme also Text aus der 'Object Name' property     
+                    print("Nutzt keine Collection Instanz")
+                    name = get_base_object_name(obj.name) #Nehme also Namen des Objekts     
                 else:
                     print("Nutzt Collection Instanz")
                     name = (obj.instance_collection.name) #Nehme Namen der Collection als Objektnamen
@@ -3099,7 +3104,7 @@ def Export(GalaxyMapName, ZoneID):
         for obj in bpy.data.collections["Areas" + ZonePrefix].all_objects: #Jedes Objekt in csv umwandeln
             if (obj["Layer"]) == LayerName:
 
-                name = (obj["Object Name"]) #Nehme Text aus der 'name' property
+                name = get_base_object_name(obj.name)
                 I_id = (obj["Link ID"])
                 Obj_arg0 = (obj["Obj_Arg0"])
                 Obj_arg1 = (obj["Obj_Arg1"])
@@ -3133,34 +3138,28 @@ def Export(GalaxyMapName, ZoneID):
                 
 
                 try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 0  Cube"]:
+                    if obj.instance_collection.name == "AreaShape 0  Cube":
                         AreaShapeNo = "0"
-                except:
-                    AreaShapeNo = "0"
-                    
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 1  Cube Middle"]:
-                        AreaShapeNo = "1"
-                except:
-                    AreaShapeNo = "1"
-                    
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 2  Sphere"]:
-                        AreaShapeNo = "2"
-                except:
-                    AreaShapeNo = "2"
                         
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 3  Cylinder"]:
+                    if obj.instance_collection.name == "AreaShape 1  Cube Middle":
+                        AreaShapeNo = "1"
+                        
+                    if obj.instance_collection.name == "AreaShape 2  Sphere":
+                        AreaShapeNo = "2"
+                        
+                    if obj.instance_collection.name == "AreaShape 3  Cylinder":
                         AreaShapeNo = "3"
-                except:
-                    AreaShapeNo = "3"
-                
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 4  Half Sphere"]:
+                        
+                    if obj.instance_collection.name == "AreaShape 4  Half Sphere":
                         AreaShapeNo = "4"
-                except:
-                    AreaShapeNo = "4"
+                        
+                except: 
+                    
+                    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+                    print("fehlerhaftes Areal")
+                    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+                    AreaShapeNo = "0"
                 
                     
                 
@@ -3212,7 +3211,7 @@ def Export(GalaxyMapName, ZoneID):
         for obj in bpy.data.collections["Cameras" + ZonePrefix].all_objects: #Jedes Objekt in csv umwandeln
             if (obj["Layer"]) == LayerName:
 
-                name = (obj["Object Name"]) #Nehme Text aus der 'name' property
+                name = "CameraArea"
                 I_id = (obj["Link ID"])
                 Obj_arg0 = (obj["Camera ID"])
                 Obj_arg1 = (obj["Obj_Arg1"])
@@ -3243,35 +3242,30 @@ def Export(GalaxyMapName, ZoneID):
                 FollowId = (obj["Linked Area ID"])
                 
                 try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 0  Cube"]:
+                    if obj.instance_collection.name == "AreaShape 0  Cube":
                         AreaShapeNo = "0"
-                except:
+                        
+                    if obj.instance_collection.name == "AreaShape 1  Cube Middle":
+                        AreaShapeNo = "1"
+                        
+                    if obj.instance_collection.name == "AreaShape 2  Sphere":
+                        AreaShapeNo = "2"
+                        
+                    if obj.instance_collection.name == "AreaShape 3  Cylinder":
+                        AreaShapeNo = "3"
+                        
+                    if obj.instance_collection.name == "AreaShape 4  Half Sphere":
+                        AreaShapeNo = "4"
+                        
+                except: 
+                    
+                    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+                    print("fehlerhaftes Areal")
+                    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
                     AreaShapeNo = "0"
                     
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 1  Cube Middle"]:
-                        AreaShapeNo = "1"
-                except:
-                    AreaShapeNo = "1"
                     
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 2  Sphere"]:
-                        AreaShapeNo = "2"
-                except:
-                    AreaShapeNo = "2"
-                        
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 3  Cylinder"]:
-                        AreaShapeNo = "3"
-                except:
-                    AreaShapeNo = "3"
-                
-                try:
-                    if obj.instance_collection == bpy.data.collections["AreaShape 4  Half Sphere"]:
-                        AreaShapeNo = "4"
-                except:
-                    AreaShapeNo = "4"
-                
                 MapParts_ID = (obj["Linked MapParts ID"])
                 Obj_ID = (obj["Linked Object ID"])  
                 
@@ -3313,7 +3307,7 @@ def Export(GalaxyMapName, ZoneID):
         for obj in bpy.data.collections["Cutscenes" + ZonePrefix].all_objects: #Jedes Objekt in csv umwandeln
             if (obj["Layer"]) == LayerName:
 
-                name = (obj["Object Name"])
+                name = get_base_object_name(obj.name)
                 DemoName = (obj["Cutscene Name"])
                 TimeSheetName = (obj["Sheet Name"])
                 I_id = (obj["Link ID"])
@@ -3380,73 +3374,77 @@ def Export(GalaxyMapName, ZoneID):
         active = bpy.context.view_layer.objects.active
 
         for obj in bpy.data.collections["Objects" + ZonePrefix].all_objects: #Jedes Objekt in csv umwandeln
-            if (obj["Layer"]) == LayerName:
-                
-                #Checken, ob es Collection Instanz nutzt
-                if obj.instance_collection == None:
-                    print("Nutzt leine Collection Instanz")
-                    name = (obj["Object Name"]) #Nehme also Text aus der 'Object Name' property     
-                else:
-                    print("Nutzt Collection Instanz")
-                    name = (obj.instance_collection.name) #Nehme Namen der Collection als Objektnamen
+            if "Layer" in obj:
+                if (obj["Layer"]) == LayerName:
+                        
+                    #Checken, ob es Collection Instanz nutzt
+                    if obj.instance_collection == None:
+                        print("Nutzt keine Collection Instanz")
+                        name = get_base_object_name(obj.name)     
+                    else:
+                        print("Nutzt Collection Instanz")
+                        name = (obj.instance_collection.name) #Nehme Namen der Collection als Objektnamen
 
+                    
+                    
+                    
+                    
+                    I_id = (obj["Link ID"])
+                    obj_arg0 = (obj["Obj_Arg0"])
+                    obj_arg1 = (obj["Obj_Arg1"])
+                    obj_arg2 = (obj["Obj_Arg2"])
+                    obj_arg3 = (obj["Obj_Arg3"])
+                    obj_arg4 = (obj["Obj_Arg4"])
+                    obj_arg5 = (obj["Obj_Arg5"])
+                    obj_arg6 = (obj["Obj_Arg6"])
+                    obj_arg7 = (obj["Obj_Arg7"])
+                    CameraSetId = (obj["Camera Set ID"])
+                    SW_APPEAR = (obj["SW_APPEAR"])
+                    SW_DEAD = (obj["SW_DEAD"])
+                    SW_A = (obj["SW_A"])
+                    SW_B = (obj["SW_B"])
+                    SW_AWAKE = (obj["SW_AWAKE"])
+                    SW_PARAM = (obj["SW_PARAM"])
+                    MessageId = (obj["Message ID"])
+                    ParamScale = (obj["Speed Scale"])
+                    
+                    pos_x = (obj.location[0])
+                    pos_y = (obj.location[2])
+                    pos_z = (obj.location[1]) * -1
+                    dir_x = (obj.rotation_euler[0])
+                    dir_y = (obj.rotation_euler[2])
+                    dir_z = (obj.rotation_euler[1]) * -1
+                    scale_x = (obj.scale[0])
+                    scale_y = (obj.scale[2])
+                    scale_z = (obj.scale[1])
+                    
+                    dir_x = (math.degrees(dir_x)) #radians zu Grad (degree)
+                    dir_y = (math.degrees(dir_y))
+                    dir_z = (math.degrees(dir_z))
+                    
+                    CastId = (obj["Cast Group ID"])
+                    ViewGroupId = (obj["View Group ID"])
+                    ShapeModelNo = (obj["Model ID"])
+                    CommonPath_ID = (obj["Path ID"])
+                    ClippingGroupId = (obj["Clipping Group ID"])
+                    GroupId = (obj["Group ID"])
+                    DemoGroupId = (obj["Cutscene Group ID"])
+                    MapParts_ID = (obj["Linked MapParts ID"])
+                    Obj_ID = (obj["Linked Object ID"])
+                    GeneratorID = (obj["Generator Object ID"])
+                    
+                    
+                    
+                    #Baue CSV Code zusammen:
+                    OBJEKTCODE = str(name) + "," + str(I_id) + "," + str(obj_arg0) + "," + str(obj_arg1) + "," + str(obj_arg2) + "," + str(obj_arg3) + "," + str(obj_arg4) + "," + str(obj_arg5) + "," + str(obj_arg6) + "," + str(obj_arg7) + "," + str(CameraSetId) + "," + str(SW_APPEAR) + "," + str(SW_DEAD) + "," + str(SW_A) + "," + str(SW_B) + "," + str(SW_AWAKE) + "," + str(SW_PARAM) + "," + str(MessageId) + "," + str(ParamScale) + "," + str(pos_x) + "," + str(pos_y) + "," + str(pos_z) + "," + str(dir_x) + "," + str(dir_y) + "," + str(dir_z) + "," + str(scale_x) + "," + str(scale_y) + "," + str(scale_z) + "," + str(CastId) + "," + str(ViewGroupId) + "," + str(ShapeModelNo) + "," + str(CommonPath_ID) + "," + str(ClippingGroupId) + "," + str(GroupId) + "," + str(DemoGroupId) + "," + str(MapParts_ID) + "," + str(Obj_ID) + "," + str(GeneratorID)
+                    
+                    blenderCipher.write('\n'+OBJEKTCODE) #Schreibe Code in die CSV
+                    
+                    print(name) #Debug
+                    print(OBJEKTCODE) #Debug
                 
-                
-                
-                
-                I_id = (obj["Link ID"])
-                obj_arg0 = (obj["Obj_Arg0"])
-                obj_arg1 = (obj["Obj_Arg1"])
-                obj_arg2 = (obj["Obj_Arg2"])
-                obj_arg3 = (obj["Obj_Arg3"])
-                obj_arg4 = (obj["Obj_Arg4"])
-                obj_arg5 = (obj["Obj_Arg5"])
-                obj_arg6 = (obj["Obj_Arg6"])
-                obj_arg7 = (obj["Obj_Arg7"])
-                CameraSetId = (obj["Camera Set ID"])
-                SW_APPEAR = (obj["SW_APPEAR"])
-                SW_DEAD = (obj["SW_DEAD"])
-                SW_A = (obj["SW_A"])
-                SW_B = (obj["SW_B"])
-                SW_AWAKE = (obj["SW_AWAKE"])
-                SW_PARAM = (obj["SW_PARAM"])
-                MessageId = (obj["Message ID"])
-                ParamScale = (obj["Speed Scale"])
-                
-                pos_x = (obj.location[0])
-                pos_y = (obj.location[2])
-                pos_z = (obj.location[1]) * -1
-                dir_x = (obj.rotation_euler[0])
-                dir_y = (obj.rotation_euler[2])
-                dir_z = (obj.rotation_euler[1]) * -1
-                scale_x = (obj.scale[0])
-                scale_y = (obj.scale[2])
-                scale_z = (obj.scale[1])
-                
-                dir_x = (math.degrees(dir_x)) #radians zu Grad (degree)
-                dir_y = (math.degrees(dir_y))
-                dir_z = (math.degrees(dir_z))
-                
-                CastId = (obj["Cast Group ID"])
-                ViewGroupId = (obj["View Group ID"])
-                ShapeModelNo = (obj["Model ID"])
-                CommonPath_ID = (obj["Path ID"])
-                ClippingGroupId = (obj["Clipping Group ID"])
-                GroupId = (obj["Group ID"])
-                DemoGroupId = (obj["Cutscene Group ID"])
-                MapParts_ID = (obj["Linked MapParts ID"])
-                Obj_ID = (obj["Linked Object ID"])
-                GeneratorID = (obj["Generator Object ID"])
-                
-                
-                
-                #Baue CSV Code zusammen:
-                OBJEKTCODE = str(name) + "," + str(I_id) + "," + str(obj_arg0) + "," + str(obj_arg1) + "," + str(obj_arg2) + "," + str(obj_arg3) + "," + str(obj_arg4) + "," + str(obj_arg5) + "," + str(obj_arg6) + "," + str(obj_arg7) + "," + str(CameraSetId) + "," + str(SW_APPEAR) + "," + str(SW_DEAD) + "," + str(SW_A) + "," + str(SW_B) + "," + str(SW_AWAKE) + "," + str(SW_PARAM) + "," + str(MessageId) + "," + str(ParamScale) + "," + str(pos_x) + "," + str(pos_y) + "," + str(pos_z) + "," + str(dir_x) + "," + str(dir_y) + "," + str(dir_z) + "," + str(scale_x) + "," + str(scale_y) + "," + str(scale_z) + "," + str(CastId) + "," + str(ViewGroupId) + "," + str(ShapeModelNo) + "," + str(CommonPath_ID) + "," + str(ClippingGroupId) + "," + str(GroupId) + "," + str(DemoGroupId) + "," + str(MapParts_ID) + "," + str(Obj_ID) + "," + str(GeneratorID)
-                
-                blenderCipher.write('\n'+OBJEKTCODE) #Schreibe Code in die CSV
-                
-                print(name) #Debug
-                print(OBJEKTCODE) #Debug
+            
+            
             
         blenderCipher.close() #CSV Datei schliessen
 
@@ -3536,8 +3534,9 @@ def Export(GalaxyMapName, ZoneID):
                 ### PATH:
                 #CommonPath_ID = (obj["Path ID"])
                 try:
-                    GNodePathObjName = str(bpy.context.object.modifiers["GRAVITY"]["Input_9"].name) #Den Objektnamen im GeometryNode rauskriegen
-                    CommonPath_ID = int(bpy.data.objects[GNodePathObjName].data.name) #Kriege Curve Data Namen (nicht objektnamen)
+                    GNodePathObjName = str(obj.modifiers["GRAVITY"]["Input_9"].name) #Den Objektnamen im GeometryNode rauskriegen
+                    CommonPath_ID = bpy.data.objects[GNodePathObjName].data.name #Kriege Curve Data Namen (nicht objektnamen)
+                    CommonPath_ID = CommonPath_ID.replace(ZonePrefix, '') #Prefix entfernen
                 except:
                     CommonPath_ID = int(-1) #Falls es leer ist oder die Curvedatanamen keine Zahl ist, nehme einfach -1
                 ######
@@ -3600,7 +3599,6 @@ def Export(GalaxyMapName, ZoneID):
                         name = (obj.name)
                 else:
                     print("Nutzt KEINE Collection Instanz")
-                    #name = (obj["Object Name"]) #Nehme also Text aus der 'Object Name' property
                     name = (obj.name)
                 I_id = (obj["Link ID"])
                 
@@ -4333,7 +4331,12 @@ def Export(GalaxyMapName, ZoneID):
         os.popen(("pyjmap tojmap smg ") + (bpy.path.abspath('//05_MapExport\\')+MapName+'\\stage\\jmp\\List\\ScenarioSettings ') + (bpy.path.abspath('//05_MapExport\\')+MapName+'\\stage\\jmp\\List\\ScenarioSettings'))
 
 
-
+    # ### DEBUG INFO ###
+    # # falls was kaputt geht
+    # DebugText= "Exported with SuperBlenderGalaxy v.0.6"
+    # blenderCipher=open(bpy.path.abspath('//05_MapExport\\')+MapName+'\\stage\\ExportInfo.txt','w') # Text Datei erstellen und oeffnen (ueberschreibt es auch)
+    # blenderCipher.write(DebugText) #Die Headings hinzufuegen
+    # blenderCipher.close() #Text Datei schliessen
 	
 def MapARCEntpacken(GalaxyMapName, WiiExplorerPathFolder, GalaxyFilesystem):
 
@@ -4798,10 +4801,13 @@ def ZonenCreate(ZonenName, ZoneID):
         # if it doesn't exist create it
         if coll is None:
             print("Existiert noch nicht. Gut")
+            
         else:
             col = bpy.data.collections.get(name)
             if col:
                 col.name = name + "_OLD"
+                ZoneID = bpy.data.collections[name + "_OLD"]["Zone ID"] #Alte ID aufgreifen und fur neue Zone nehmen
+                ZonePrefix = "  (Z" + str(ZoneID) + ")"
                 bpy.data.collections[name + "_OLD"]["Zone ID"] = "NONE"
                 
                 
@@ -4884,10 +4890,11 @@ class AddZoneToScenario(bpy.types.Operator):
     bl_label = "Add Zone to scenario"
     def execute(self, context):
         ZoneName = bpy.context.collection.name
+        scene = bpy.context.scene
         if "Zone ID" in bpy.context.collection:
-            for scene in bpy.data.scenes:
-                if "ScenarioName" in scene:
-                    bpy.context.scene[ZoneName] = "0"
+            for view_layer in scene.view_layers:
+                if "ScenarioName" in view_layer:
+                    bpy.context.view_layer[ZoneName] = "0"
         return {'FINISHED'}
 
 def ScenarioARCEntpacken(GalaxyMapName, WiiExplorerPathFolder, GalaxyFilesystem):
@@ -4975,6 +4982,161 @@ def HashCalculate(valHash):
     print(valHash)
 	
 	
+def GiveFreeSwitchID(Switch, FullGalaxy):
+
+    def GetFreeSwitchID(collections, properties, min_value=0, max_value=127):
+        used_values = set()
+
+        # Alle Objekte in den angegebenen Collections durchgehen
+        for collection in collections:
+            for obj in collection.objects:
+                for prop in properties:
+                    if prop in obj:  # Prüfen, ob die Property existiert
+                        used_values.add(obj[prop])
+
+        # Die kleinste nicht verwendete Zahl im Bereich finden
+        for new_value in range(min_value, max_value + 1):
+            if new_value not in used_values:
+                return new_value
+
+        return None  # Falls keine Zahl im Bereich verfügbar ist
+        
+        
+        
+    ## ZONE ID Vom aktiven Objekt bekommen ##
+    
+    ## WHY GEHT DIESE  SCHEISSE NICHT ?????!??
+    
+    # obj = bpy.context.object  # Das aktuell ausgewählte Objekt
+
+    # if obj:
+        # collections = obj.users_collection  # Alle Collections des Objekts
+        
+        # for col in collections:
+            # if "Zone ID" in col:  # Prüfen, ob die Collection das Custom Property hat
+                # ZoneID = col["Zone ID"]  # Den Wert abrufen
+                # print(f"Zone ID-Wert: {ZoneID}")
+                # print("-------------------------------------")
+                # break  # Falls nur die erste passende Collection ausgegeben werden soll
+        # else:
+            # print("Keine Collection mit 'Zone ID' gefunden. -------------------------------------")
+    # else:
+        # print("Kein Objekt ausgewählt.-------------------------------------")
+    
+    # Hier ich geb auf, du arsch:
+    GalaxyMapName = bpy.context.collection.name
+    ZoneID = bpy.data.collections[GalaxyMapName]["Zone ID"]
+    
+    ZonePrefix = "  (Z" + str(ZoneID) + ")"
+    if ZoneID == 0:
+        ZonePrefix = ""
+
+
+    # Namen der Collections, die geprüft werden sollen
+    collection_names = ["Objects" + ZonePrefix, "MapParts" + ZonePrefix, "Spawns" + ZonePrefix, "Cameras" + ZonePrefix, "Areas" + ZonePrefix, "Gravities" + ZonePrefix]
+
+    # Liste der Collections abrufen
+    
+    if FullGalaxy == False:
+        collections = [bpy.data.collections.get(name) for name in collection_names if bpy.data.collections.get(name)]
+    else:
+        collections = bpy.data.collections  # Alle Collections verwenden
+
+
+    # Properties, die gecheckt werden sollen
+    properties_to_check = {"SW_A", "SW_APPEAR", "SW_B", "SW_AWAKE", "SW_PARAM", "SW_DEAD"}
+
+    if collections:
+        if FullGalaxy == False:
+            unused_value = GetFreeSwitchID(collections, properties_to_check, 0, 127)  #Per Zone 0-127, global alles: 1000-1127
+            
+            if unused_value is not None:
+                print(f"Die nächste freie Zahl im Bereich 0-127 ist: {unused_value}")
+                
+                
+                #bpy.context.object["SW_A"] = unused_value
+                bpy.context.object[Switch] = unused_value
+            else:
+                print("Es gibt keine freien Zahlen mehr im Bereich 0-127!")
+                self.report({'INFO'}, "NO SWITCH AVAILABLE! 0-127 are used!")
+                
+        else:
+            unused_value = GetFreeSwitchID(collections, properties_to_check, 1000, 1127)
+            
+            if unused_value is not None:
+                print(f"Die nächste freie Zahl im Bereich 1000-1127 ist: {unused_value}")
+                
+                #bpy.context.object["SW_A"] = unused_value
+                bpy.context.object[Switch] = unused_value
+            else:
+                print("Es gibt keine freien Zahlen mehr im Bereich 1000-1127!")
+                self.report({'INFO'}, "NO SWITCH AVAILABLE! 1000-1127 are used!")
+    else:
+        print("Keine der angegebenen Collections wurde gefunden!")
+        self.report({'INFO'}, "Collections don't exist")
+
+    
+    
+import bpy
+import xml.etree.ElementTree as ET
+import os
+
+# Globaler Cache für XML-Daten (kein lag)
+xml_cache = {}
+
+def load_labels_from_xml(obj_name, NumberOfArgs, IsGravityObject):
+    global xml_cache
+
+    # XML-Pfad abrufen
+    xml_path = bpy.context.workspace.get("Object Database", "")
+    
+    # Prüfen, ob Datei existiert
+    if not os.path.exists(xml_path):
+        return "Unknown", [f"Obj_Arg{i}" for i in range(NumberOfArgs)]
+
+    # Prüfen, ob XML bereits geladen wurde
+    if xml_path not in xml_cache:
+        try:
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+            xml_cache[xml_path] = {obj.get("id"): obj for obj in root.findall("object")}
+        except Exception as e:
+            print(f"Fehler beim Laden der XML: {e}")
+            return "Unknown", [f"Obj_Arg{i}" for i in range(NumberOfArgs)]
+
+    # Objekt suchen
+    obj_data = xml_cache[xml_path].get(obj_name)
+    if obj_data:
+        display_name = obj_data.find("name").text if obj_data.find("name") is not None else "Unknown"
+        labels = [field.get("name", f"Obj_Arg{i}") for i, field in enumerate(obj_data.findall("field"))]
+        # Standard-Notes aus XML
+        notes = obj_data.find("notes").text if obj_data.find("notes") is not None else ""
+
+        # Field-Infos an Notes anhängen
+        notes = notes + "\n-- PARAMETERS --"
+        for field in obj_data.findall("field"):
+            field_id = field.get("id", "?")
+            name = field.get("name", "Unknown")
+            field_notes = field.get("notes", "").replace("&quot;", "\"")
+            values = field.get("values", "None").replace("&quot;", "\"")
+
+            # Formatierung der Field-Informationen
+            field_text = f"\n~ {name} (arg{field_id}) ~\n{field_notes}\n{values}\n|\n"
+
+            # Falls values leer ist, nicht anzeigen
+            if values == "None":
+                field_text = f"Arg {field_id}: {name}. {field_notes}."
+
+            # Notes erweitern
+            notes += f"\n\n{field_text}" if notes else field_text
+
+        return display_name, labels, notes
+
+    return "Unknown", [f"Obj_Arg{i}" for i in range(NumberOfArgs)], "Undocumented"  # Fallback
+
+    
+    
+
 ###CLASSES -----------------------------------------------------
 
 class GalaxyMapOperator1(bpy.types.Operator):
@@ -4990,7 +5152,7 @@ class GalaxyMapOperator1(bpy.types.Operator):
         BlendFilesFolder = bpy.context.workspace["Workspace (for searching in Blend files)"]
         
         
-        if bpy.context.workspace["Asset Searching Enabled"] == 0:
+        if bpy.context.workspace["Asset Searching Enabled"] == False:
             AssetSearch = False
         else:
             AssetSearch = True
@@ -5016,6 +5178,7 @@ class GalaxyMapOperator1(bpy.types.Operator):
             
             #Erstmal nur die Collections erstellen
             bpy.ops.scene.new(type='NEW') # Neue Scene erstellen
+            bpy.context.scene.name = "LEVEL EDITING"
             ZoneID = 0
             for i in range(row_count): #row_count ist wie oft er das hier wiederholen soll
                 for row in reader:
@@ -5080,26 +5243,51 @@ class GalaxyMapOperator1(bpy.types.Operator):
                     
                     
                     
-                    #Scene per Scenario erstellen:
-                    if ScenarioID == 1:
-                        print("bla")
-                    else:
-                        bpy.ops.scene.new(type='LINK_COPY')
-
-                    bpy.context.scene.name = "[" + str(ScenarioID) + "] " + str(ScenarioName) #nur name
+                    # VIEW LAYER per Scenario erstellen:
                     
-                    bpy.context.scene["StarMask"] = int(StarMask)
-                    bpy.context.scene["ScenarioNo"] = int(ScenarioID)
-                    bpy.context.scene["ScenarioName"] = ScenarioName
-                    bpy.context.scene["Scenario Type"] = PowerStarType #Scenario typ, also ob grun oder hidden
-                    bpy.context.scene["Power Star Trigger"] = AppearPowerStarObj
-                    bpy.context.scene["Comet"] = Comet
-                    bpy.context.scene["Comet Time Limit"] = CometLimitTimer #In Sekunden
-                    bpy.context.scene["LuigiModeTimer (unused)"] = LuigiModeTimer
+                    NewLayerName = "[" + str(ScenarioID) + "] " + str(ScenarioName)
+                    
+                    if ScenarioID == 1:
+                        bpy.context.scene.view_layers["ViewLayer"].name = NewLayerName
+                    else:
+                        # Überprüfen, ob der Name bereits existiert
+                        if NewLayerName not in bpy.context.scene.view_layers:
+                            TheNewLayer = bpy.context.scene.view_layers.new(name=NewLayerName)
+                            print(f"Neuer View Layer '{NewLayerName}' wurde erstellt.")
+                        else:
+                            print(f"View Layer '{NewLayerName}' existiert bereits.")
+                        
+                        bpy.context.window.view_layer = bpy.context.scene.view_layers[NewLayerName] #neuen Layer als den aktiven machen
+
+
+
+                    # bpy.context.scene.name = "[" + str(ScenarioID) + "] " + str(ScenarioName) #nur name
+                    
+                    # bpy.context.scene["StarMask"] = int(StarMask)
+                    # bpy.context.scene["ScenarioNo"] = int(ScenarioID)
+                    # bpy.context.scene["ScenarioName"] = ScenarioName
+                    # bpy.context.scene["Scenario Type"] = PowerStarType #Scenario typ, also ob grun oder hidden
+                    # bpy.context.scene["Power Star Trigger"] = AppearPowerStarObj
+                    # bpy.context.scene["Comet"] = Comet
+                    # bpy.context.scene["Comet Time Limit"] = CometLimitTimer #In Sekunden
+                    # bpy.context.scene["LuigiModeTimer (unused)"] = LuigiModeTimer
+                    
+                    ## 
+                    
+
+                    
+                    bpy.context.scene.view_layers[NewLayerName]["StarMask"] = int(StarMask)
+                    bpy.context.scene.view_layers[NewLayerName]["ScenarioNo"] = int(ScenarioID)
+                    bpy.context.scene.view_layers[NewLayerName]["ScenarioName"] = ScenarioName
+                    bpy.context.scene.view_layers[NewLayerName]["Scenario Type"] = PowerStarType #Scenario typ, also ob grun oder hidden
+                    bpy.context.scene.view_layers[NewLayerName]["Power Star Trigger"] = AppearPowerStarObj
+                    bpy.context.scene.view_layers[NewLayerName]["Comet"] = Comet
+                    bpy.context.scene.view_layers[NewLayerName]["Comet Time Limit"] = CometLimitTimer #In Sekunden
+                    bpy.context.scene.view_layers[NewLayerName]["LuigiModeTimer (unused)"] = LuigiModeTimer
                     
                     # GLE
                     if GLE_PowserStarColor == True:
-                        bpy.context.scene["Power Star Color"] = PowerStarColor
+                        bpy.context.scene.view_layers[NewLayerName]["Power Star Color"] = PowerStarColor
                         
                     
 
@@ -5107,7 +5295,7 @@ class GalaxyMapOperator1(bpy.types.Operator):
                         print(val)
                         try:
                             LayerMask = row[val + ":Int:0"] #val ist der ZonenName. Nehme Info von der ZonenNamen Colunm
-                            bpy.context.scene[val] = LayerMask #Property fuer Scene mit Zonennamen und dessen Layer Mask
+                            bpy.context.scene.view_layers[NewLayerName][val] = LayerMask #Property fuer Scene mit Zonennamen und dessen Layer Mask
                         except: #Falls es als Hashish und nicht normalen Namen gespeichert ist und so
                             valHash = val
                             #HashCalculate(valHash) #Er uebernimmt den neuen string net...
@@ -5121,11 +5309,11 @@ class GalaxyMapOperator1(bpy.types.Operator):
                             print(valHash)
                             
                             LayerMask = row["["+valHash+"]" + ":Int:0"] #val ist der ZonenName. Nehme Info von der ZonenNamen Colunm
-                            bpy.context.scene[val] = LayerMask #Property fuer Scene mit Zonennamen und dessen Layer Mask
+                            bpy.context.scene.view_layers[NewLayerName][val] = LayerMask #Property fuer Scene mit Zonennamen und dessen Layer Mask
                         try:
                             LayerDisplay(val)
                         except:
-                            print("")
+                            print("LayerDisplay hat net geklappt!")
                     
                     ScenarioLoopID = ScenarioLoopID + 1
             
@@ -5181,6 +5369,7 @@ class GalaxyMapOperator1(bpy.types.Operator):
         
                     except:
                         print("bla")
+        self.report({'INFO'}, "GALAXY IMPORTED!")
         return {'FINISHED'}
     
 
@@ -5212,17 +5401,18 @@ class GalaxyMapOperator2(bpy.types.Operator):
                 ZoneCount = ZoneCount + 1
         ZoneID = ZoneCount #Get a free Zone ID for new zone
 
-        
-        for scene in bpy.data.scenes:
-            if "ScenarioNo" in scene:
+        scene = bpy.context.scene
+        for view_layer in scene.view_layers:
+            if "ScenarioNo" in view_layer:
                 #print(scene["Test"])
-                scene[GalaxyMapName] = 0 #Star Mask add
+                bpy.context.view_layer[GalaxyMapName] = 0 #Star Mask add
         
         ZonenCreate(ZonenName, ZoneID)
         MapARCEntpacken(GalaxyMapName, WiiExplorerPathFolder, GalaxyFilesystem)
         MapBCSVZuCSV(GalaxyMapName, GalaxyFilesystem)
         CSVtoBlender(self, GalaxyMapName, ZoneID, AssetSearch, MapAssetBlendFile, BlendFilesFolder)
         #ArcPack(context) #
+        self.report({'INFO'}, "ZONE IMPORTED!")
         return {'FINISHED'}
     
 class GalaxyMapOperator3(bpy.types.Operator):
@@ -5253,7 +5443,7 @@ class GalaxyMapOperator3(bpy.types.Operator):
         
                 
 
-
+        self.report({'INFO'}, "GALAXY EXPORTED!")
         return {'FINISHED'}
     
 class GalaxyMapOperator4(bpy.types.Operator):
@@ -5261,6 +5451,9 @@ class GalaxyMapOperator4(bpy.types.Operator):
     bl_idname = "objectu.galaxymap_operator4" 
     bl_label = "Export Single Zone" 
     def execute(self, context):
+        if not "Zone ID" in bpy.context.collection:
+            self.report({'WARNING'}, 'No valid Zone selected!')
+            return {'FINISHED'}
         GalaxyMapName = bpy.context.collection.name
         ZoneID = bpy.data.collections[GalaxyMapName]["Zone ID"]
         WiiExplorerPathFolder = bpy.context.workspace["WiiExplorer Folder Path"]
@@ -5268,6 +5461,8 @@ class GalaxyMapOperator4(bpy.types.Operator):
         
         Export(GalaxyMapName, ZoneID)
         ArcPack(GalaxyMapName, WiiExplorerPathFolder, GalaxyFilesystem)
+        
+        self.report({'INFO'}, '"'+GalaxyMapName + '" successfully exported!')
         return {'FINISHED'}
  
  
@@ -5291,14 +5486,15 @@ class GalaxyMapOperator5(bpy.types.Operator):
                 ZoneCount = ZoneCount + 1
         ZoneID = ZoneCount #Get a free Zone ID for new zone
 
-        
-        for scene in bpy.data.scenes:
-            if "ScenarioNo" in scene:
+        scene = bpy.context.scene
+        for view_layer in scene.view_layers:
+            if "ScenarioNo" in view_layer:
                 #print(scene["Test"])
-                scene[GalaxyMapName] = "0" #Star Mask add
+                view_layer[GalaxyMapName] = "0" #Star Mask add
         
         ZonenCreate(ZonenName, ZoneID)
         bpy.data.collections[ZonenName]["Zone ID"] = ZoneID
+        self.report({'INFO'}, "Zone "+ZonenName+" created!")
         return {'FINISHED'}
     
 class GalaxyMapOperator6(bpy.types.Operator):
@@ -5311,6 +5507,7 @@ class GalaxyMapOperator6(bpy.types.Operator):
        CameraEditorPathFolder = bpy.context.workspace["LaunchCamPlus Folder Path"]
        
        CameraEdit(GalaxyMapName, WiiExplorerPathFolder, CameraEditorPathFolder)
+       self.report({'INFO'}, "Launch Cam Plus will be started")
        return {'FINISHED'}
    
    
@@ -5408,12 +5605,17 @@ class GalaxyMapOperator8(bpy.types.Operator):
         
         ScenarioList = []
         ScenarioCounter = 0
-        for scene in bpy.data.scenes:
-            #print(scene.name)
-            if "ScenarioNo" in scene:
-                #print(scene["Test"])
+        # for scene in bpy.data.scenes:
+            # #print(scene.name)
+            # if "ScenarioNo" in scene:
+                # #print(scene["Test"])
+                # ScenarioCounter = ScenarioCounter + 1
+        scene = bpy.context.scene
+        for view_layer in scene.view_layers:
+            print(f"View Layer: {view_layer.name}")
+            if "ScenarioNo" in view_layer:
+                print(f"  ScenarioNo: {view_layer['ScenarioNo']}")
                 ScenarioCounter = ScenarioCounter + 1
-
 
 
         ## Headings, mit Zonennamen hinzufugen
@@ -5430,20 +5632,22 @@ class GalaxyMapOperator8(bpy.types.Operator):
         ScenarioCounter2 = 1
         GLE_PowerStarColorCheck = 0
         
+        scene = bpy.context.scene
         for x in range(ScenarioCounter):
-            for scene in bpy.data.scenes:
-                if "ScenarioNo" in scene:
-                    if scene["ScenarioNo"] == ScenarioCounter2:
-                        ScenarioID = scene["ScenarioNo"]
-                        ScenarioName = scene["ScenarioName"]
-                        PowerStarType = scene["Scenario Type"]
-                        StarMask = scene["StarMask"]
-                        AppearPowerStarObj = scene["Power Star Trigger"]
-                        Comet = scene["Comet"]
-                        CometLimitTimer = scene["Comet Time Limit"]
-                        LuigiModeTimer = scene["LuigiModeTimer (unused)"]
+            for view_layer in scene.view_layers:
+                if "ScenarioNo" in view_layer:
+                    if view_layer["ScenarioNo"] == ScenarioCounter2:
+                        ScenarioID = view_layer["ScenarioNo"]
+                        ScenarioName = view_layer["ScenarioName"]
+                        PowerStarType = view_layer["Scenario Type"]
+                        StarMask = view_layer["StarMask"]
+                        ####Todo kein starmask sondern auswahl, bwz boolean array
+                        AppearPowerStarObj = view_layer["Power Star Trigger"]
+                        Comet = view_layer["Comet"]
+                        CometLimitTimer = view_layer["Comet Time Limit"]
+                        LuigiModeTimer = view_layer["LuigiModeTimer (unused)"]
                         try: #GLE
-                            PowerStarColor = scene["Power Star Color"]
+                            PowerStarColor = view_layer["Power Star Color"]
                             PowerStarColor = "," + str(PowerStarColor)
                             if not GLE_PowerStarColorCheck == 0:
                                 blenderCipher.write(',PowerStarColor:Int:0')
@@ -5451,7 +5655,7 @@ class GalaxyMapOperator8(bpy.types.Operator):
                         except:
                             PowerStarColor = ""
                         
-                        ### Temporare PyMap Bug Loesung
+                        ### Temporare PyMap Bug Loesung. Einziges Problem: Stern nicht normal im Scenario Select da. Geht trotzdem mit Level-Select Patch
                         if Comet == "":
                             Comet = " "
                         if AppearPowerStarObj == "":
@@ -5463,7 +5667,7 @@ class GalaxyMapOperator8(bpy.types.Operator):
                         blenderCipher.write('\n'+str(ScenarioID) + "," + str(ScenarioName) + "," + str(StarMask) + "," + str(AppearPowerStarObj) + "," + str(PowerStarType) + "," + str(Comet) + "," + str(CometLimitTimer) + "," + str(LuigiModeTimer))
 
                         for ZoneListName in ZoneList:
-                            blenderCipher.write(','+scene[ZoneListName])
+                            blenderCipher.write(','+view_layer[ZoneListName])
                         
                         ScenarioCounter2 = ScenarioCounter2 + 1
 
@@ -5479,6 +5683,7 @@ class GalaxyMapOperator8(bpy.types.Operator):
         
         
         #ArcPack(context) #
+        self.report({'INFO'}, "Scenario exported!")
         return {'FINISHED'}
    
 class GalaxyMapOperator9(bpy.types.Operator):
@@ -5490,29 +5695,43 @@ class GalaxyMapOperator9(bpy.types.Operator):
         ZonenName = GalaxyMapName
         
         #bpy.ops.scene.new(type='LINK_COPY')
+        
         bpy.ops.scene.new(type='NEW')
+        scene = bpy.context.scene
         
-        bpy.context.scene.name = "[1] New Scenario" #nur name
+        #bpy.context.scene.name = "[1] New Scenario" #nur name
         
-        bpy.context.scene["StarMask"] = 0
-        bpy.context.scene["ScenarioNo"] = 1
-        bpy.context.scene["ScenarioName"] = "New Scenario"
-        bpy.context.scene["Scenario Type"] = "Normal" #Scenario typ, also ob grun oder hidden
-        bpy.context.scene["Power Star Trigger"] = ""
-        bpy.context.scene["Comet"] = ""
-        bpy.context.scene["Comet Time Limit"] = 0 #In Sekunden
-        bpy.context.scene["LuigiModeTimer (unused)"] = 0
+        NewLayerName = "NewScenario"
+        
+        #bpy.context.window.view_layer = bpy.context.scene.view_layers[NewLayerName]
+        
+        
+        ScenarioID = 1
+        ZoneID = 0
+        ZonenName = bpy.context.workspace["Galaxy Name"]
+        ZonenCreate(ZonenName, ZoneID)
+        
+        #NewLayerName = "[" + str(ScenarioID) + "] " + str(ScenarioName)
+        
+        bpy.context.scene.view_layers["ViewLayer"].name = NewLayerName
 
         
-        for scene in bpy.data.scenes:
-            if "ScenarioNo" in scene:
-                #print(scene["Test"])
-                scene[GalaxyMapName] = 0 #Star Mask add
+        bpy.context.scene.view_layers[NewLayerName]["StarMask"] = 0
+        bpy.context.scene.view_layers[NewLayerName]["ScenarioNo"] = 1
+        bpy.context.scene.view_layers[NewLayerName]["ScenarioName"] = "New Scenario"
+        bpy.context.scene.view_layers[NewLayerName]["Scenario Type"] = "Normal" #Scenario typ, also ob grun oder hidden
+        bpy.context.scene.view_layers[NewLayerName]["Power Star Trigger"] = ""
+        bpy.context.scene.view_layers[NewLayerName]["Comet"] = ""
+        bpy.context.scene.view_layers[NewLayerName]["Comet Time Limit"] = 0 #In Sekunden
+        bpy.context.scene.view_layers[NewLayerName]["LuigiModeTimer (unused)"] = 0
         
-        ZoneID = 0
-        ZonenCreate(ZonenName, ZoneID)
+        #bpy.context.scene.view_layers[NewLayerName][val] = LayerMask
+        
+
         bpy.data.collections[ZonenName]["Zone ID"] = 0
         bpy.data.collections[ZonenName]["World Number"] = 1
+        
+        self.report({'INFO'}, "Galaxy "+GalaxyMapName+" created!")
         return {'FINISHED'}
     
     
@@ -5524,30 +5743,41 @@ class GalaxyMapOperator10(bpy.types.Operator):
    def execute(self, context):        
 
         ScenarioCount = 1
-        for scene in bpy.data.scenes:
-            if "ScenarioNo" in scene:
+        
+        scene = bpy.context.scene
+        for view_layer in scene.view_layers:
+            if "ScenarioNo" in view_layer:
                 ScenarioCount = ScenarioCount + 1
                 #scene[GalaxyMapName] = 0 #Star Mask add
         
-        bpy.ops.scene.new(type='LINK_COPY')
+        #bpy.ops.scene.new(type='LINK_COPY')
         #bpy.context.scene.name = "[1] New Scenario" #nur name
-        bpy.context.scene.name = "[" + str(ScenarioCount) + "] New Scenario"
+        NewLayerName = "[" + str(ScenarioCount) + "] New Scenario"
+        if NewLayerName not in bpy.context.scene.view_layers:
+            TheNewLayer = bpy.context.scene.view_layers.new(name=NewLayerName)
+            print(f"Neuer View Layer '{NewLayerName}' wurde erstellt.")
+        else:
+            print(f"View Layer '{NewLayerName}' existiert bereits.")
         
-        bpy.context.scene["StarMask"] = 0
-        bpy.context.scene["ScenarioNo"] = ScenarioCount
-        bpy.context.scene["ScenarioName"] = "New Scenario"
-        bpy.context.scene["Scenario Type"] = "Normal" #Scenario typ, also ob grun oder hidden
-        bpy.context.scene["Power Star Trigger"] = ""
-        bpy.context.scene["Comet"] = ""
-        bpy.context.scene["Comet Time Limit"] = 0 #In Sekunden
-        bpy.context.scene["LuigiModeTimer (unused)"] = 0
+        bpy.context.window.view_layer = bpy.context.scene.view_layers[NewLayerName] #neuen Layer als den aktiven machen
+        
+        bpy.context.scene.view_layers[NewLayerName]["StarMask"] = 0
+        bpy.context.scene.view_layers[NewLayerName]["ScenarioNo"] = ScenarioCount
+        bpy.context.scene.view_layers[NewLayerName]["ScenarioName"] = "New Scenario"
+        bpy.context.scene.view_layers[NewLayerName]["Scenario Type"] = "Normal" #Scenario typ, also ob grun oder hidden
+        bpy.context.scene.view_layers[NewLayerName]["Power Star Trigger"] = ""
+        bpy.context.scene.view_layers[NewLayerName]["Comet"] = ""
+        bpy.context.scene.view_layers[NewLayerName]["Comet Time Limit"] = 0 #In Sekunden
+        bpy.context.scene.view_layers[NewLayerName]["LuigiModeTimer (unused)"] = 0
         
         for Zone in bpy.data.collections:
             if "Zone ID" in Zone:
-                bpy.context.scene[Zone.name] = "0"
+                bpy.context.scene.view_layers[NewLayerName][Zone.name] = "0"
         
         #bpy.data.collections[ZonenName]["Zone ID"] = 0
         #bpy.data.collections[ZonenName]["World Number"] = 1
+        
+        self.report({'INFO'}, 'Mission "'+NewLayerName+'" created!')
         return {'FINISHED'}
 
 
@@ -5558,7 +5788,7 @@ class GalaxyMapOperator11(bpy.types.Operator): #Normal Object info apply
    bl_idname = "objecthuhuh.galaxymap_operator11" 
    bl_label = "Normal Object" 
    def execute(self, context):
-        bpy.context.object["Object Name"] = ""
+        #bpy.context.object["Object Name"] = ""
         bpy.context.object["Link ID"] = 0
         bpy.context.object["Obj_Arg0"] = -1
         bpy.context.object["Obj_Arg1"] = -1
@@ -5599,7 +5829,7 @@ class GalaxyMapOperator12(bpy.types.Operator): #MapPart Object info apply
    bl_idname = "objectheyheyhey.galaxymap_operator12" 
    bl_label = "MapPart Object" 
    def execute(self, context):
-        bpy.context.object["Object Name"] = ""
+        #bpy.context.object["Object Name"] = ""
         bpy.context.object["Link ID"] = -1
         bpy.context.object["MoveConditionType"] = 0
         bpy.context.object["RotateSpeed"] = 0
@@ -5678,13 +5908,14 @@ class GalaxyMapAddObject(bpy.types.Operator): #ADD Object
         else:
             AssetSearch = True
         #bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
-        ObjektName = input("Enter Object Name: ")
+        #ObjektName = input("Enter Object Name: ")
+        ObjektName = bpy.context.workspace["Add this object"]
         print(ObjektName)
         
         bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD')
         
         bpy.context.view_layer.objects.active.name = ObjektName
-        bpy.context.object["Object Name"] = ObjektName
+        #bpy.context.object["Object Name"] = ObjektName
         bpy.context.object["Link ID"] = 0
         bpy.context.object["Obj_Arg0"] = -1
         bpy.context.object["Obj_Arg1"] = -1
@@ -5798,13 +6029,14 @@ class GalaxyMapAddMapPart(bpy.types.Operator): #ADD MapPart
             AssetSearch = True
         
         #bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
-        ObjektName = input("Enter Object Name: ")
+        #ObjektName = input("Enter Object Name: ")
+        ObjektName = bpy.context.workspace["Add this object"]
         print(ObjektName)
         
         bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD')
         
         bpy.context.view_layer.objects.active.name = ObjektName
-        bpy.context.object["Object Name"] = ObjektName
+        #bpy.context.object["Object Name"] = ObjektName
         bpy.context.object["Link ID"] = -1
         bpy.context.object["MoveConditionType"] = 0
         bpy.context.object["RotateSpeed"] = 0
@@ -5960,7 +6192,7 @@ def GalaxyMapAddGravity(ObjektName): #ADD Gravity
     bpy.ops.object.volume_add(align='WORLD')
     
     bpy.context.view_layer.objects.active.name = name
-    bpy.context.object["Object Name"] = name
+    #bpy.context.object["Object Name"] = name
     bpy.context.object["Link ID"] = 0
     
     bpy.context.object["Range"] = 500.0
@@ -6084,7 +6316,8 @@ class GalaxyMapAddArea(bpy.types.Operator):
         MapAssetBlendFile = bpy.context.workspace["Map Assets Blend file"]
         
         #bpy.ops.wm.console_toggle() #Zum CMD Fenster springen. Geht manchmal eh net....
-        name = input("Enter Object Name: ")
+        #name = input("Enter Object Name: ")
+        name = bpy.context.workspace["Add this object"]
         print(name)
         
         #AreaShapeNo = input("Enter Shape Form: ")
@@ -6094,7 +6327,7 @@ class GalaxyMapAddArea(bpy.types.Operator):
         bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD')
 
         bpy.context.view_layer.objects.active.name = name
-        bpy.context.object["Object Name"] = name
+        #bpy.context.object["Object Name"] = name
         bpy.context.object["Link ID"] = -1
         bpy.context.object["Obj_Arg0"] = -1
         bpy.context.object["Obj_Arg1"] = -1
@@ -6117,7 +6350,7 @@ class GalaxyMapAddArea(bpy.types.Operator):
         bpy.context.object["Group ID"] = -1
         bpy.context.object["Cutscene Group ID"] = -1
         bpy.context.object["Linked MapParts ID"] = -1
-        bpy.context.object["Linked Object ID"] = 0
+        bpy.context.object["Linked Object ID"] = -1
         
         bpy.context.object["Layer"] = "Common"
         
@@ -6211,7 +6444,7 @@ class GalaxyMapAddCamera(bpy.types.Operator):
         bpy.context.object.instance_type = 'COLLECTION'
 
         bpy.context.view_layer.objects.active.name = name
-        bpy.context.object["Object Name"] = name
+        #bpy.context.object["Object Name"] = name
         bpy.context.object["Link ID"] = 0
         bpy.context.object["Camera ID"] = 0
         bpy.context.object["Obj_Arg1"] = -1
@@ -6360,7 +6593,7 @@ def GalaxyMapAddCutscene(name):
     bpy.ops.object.empty_add(type='CUBE', radius=50, align='WORLD')
     
     bpy.context.view_layer.objects.active.name = name
-    bpy.context.object["Object Name"] = ""
+    #bpy.context.object["Object Name"] = ""
     
     bpy.context.object["Cutscene Name"] = "YourDemo"
     bpy.context.object["Sheet Name"] = "YourDemo"
@@ -6402,7 +6635,7 @@ class GalaxyMapAddPosition(bpy.types.Operator):
         bpy.ops.object.empty_add(type='SINGLE_ARROW', radius=50, align='WORLD')
         
         bpy.context.view_layer.objects.active.name = "GeneralPos"
-        bpy.context.object["Object Name"] = ""
+        #bpy.context.object["Object Name"] = ""
         bpy.context.object["Linked Object ID"] = -1
         bpy.context.object["Position Name"] = "Undefined"
                     
@@ -6439,7 +6672,7 @@ class GalaxyMapAddDebug(bpy.types.Operator):
         bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD')
         
         bpy.context.view_layer.objects.active.name = "DebugMovePos"
-        bpy.context.object["Object Name"] = ""
+        #bpy.context.object["Object Name"] = ""
         bpy.context.object["Link ID"] = 0
                     
         bpy.context.object["Layer"] = "Common"
@@ -6582,7 +6815,14 @@ class GalaxyMapAddPathPointSetup(bpy.types.Operator):
         file_path = MapAssetBlendFile
         node_name = "PointArgs1"
         link = True
-        Point_ID = "0"
+        
+        Point_ID = get_selected_spline_pointid()
+        Point_ID_int = Point_ID
+        Point_ID = str(Point_ID)
+        #Point_ID = "0"
+        
+        bpy.ops.object.mode_set(mode='OBJECT')
+        
         from os.path import join as os_path_join
 
         inner_path = "NodeTree"
@@ -6601,12 +6841,160 @@ class GalaxyMapAddPathPointSetup(bpy.types.Operator):
         modifier.node_group = bpy.data.node_groups['PointArgs1']
         
         #########################################################
-
-        
+        bpy.context.object.modifiers[Point_ID]["Input_16"] = Point_ID_int #nur optisch, dieser Punkt
+        bpy.ops.object.mode_set(mode='EDIT')
         return {'FINISHED'}
 
+#### Switches ####
 
+class GalaxyMapNewSwitch_A(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap201.galaxyaddswitcha" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_A"] == -1:
+            Switch = "SW_A"
+            GiveFreeSwitchID(Switch, False)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_B(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap202.galaxyaddswitchb" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_B"] == -1:
+            Switch = "SW_B"
+            GiveFreeSwitchID(Switch, False)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Appear(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap203.galaxyaddswitchappear" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_APPEAR"] == -1:
+            Switch = "SW_APPEAR"
+            GiveFreeSwitchID(Switch, False)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Dead(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap204.galaxyaddswitchdead" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_DEAD"] == -1:
+            Switch = "SW_DEAD"
+            GiveFreeSwitchID(Switch, False)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Awake(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap205.galaxyaddswitchawake" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_AWAKE"] == -1:
+            Switch = "SW_AWAKE"
+            GiveFreeSwitchID(Switch, False)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Param(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap206.galaxyaddswitchparam" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_PARAM"] == -1:
+            Switch = "SW_PARAM"
+            GiveFreeSwitchID(Switch, False)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+### Full Galaxy Switch IDs:
 
+class GalaxyMapNewSwitch_A_FullGalaxy(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap301.galaxyaddswitchafull" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_A"] == -1:
+            Switch = "SW_A"
+            GiveFreeSwitchID(Switch, True)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_B_FullGalaxy(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap302.galaxyaddswitchbfull" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        if bpy.context.object["SW_B"] == -1:
+            Switch = "SW_B"
+            GiveFreeSwitchID(Switch, True)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Appear_FullGalaxy(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap303.galaxyaddswitchappearfull" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        self.report({'INFO'}, "Button wurde gedrückt!")
+        if bpy.context.object["SW_APPEAR"] == -1:
+            Switch = "SW_APPEAR"
+            GiveFreeSwitchID(Switch, True)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Dead_FullGalaxy(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap304.galaxyaddswitchdeadfull" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        self.report({'INFO'}, "Button wurde gedrückt!")
+        if bpy.context.object["SW_DEAD"] == -1:
+            Switch = "SW_DEAD"
+            GiveFreeSwitchID(Switch, True)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Awake_FullGalaxy(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap305.galaxyaddswitchawakefull" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        self.report({'INFO'}, "Button wurde gedrückt!")
+        if bpy.context.object["SW_AWAKE"] == -1:
+            Switch = "SW_AWAKE"
+            GiveFreeSwitchID(Switch, True)
+        else:
+            self.report({'INFO'}, "Switch ID not empty! - Replace with -1")
+        return {'FINISHED'}
+        
+class GalaxyMapNewSwitch_Param_FullGalaxy(bpy.types.Operator):
+   """Generate new switch id"""
+   bl_idname = "galaxymap306.galaxyaddswitchparamfull" 
+   bl_label = "get free switch id" 
+   def execute(self, context):
+        self.report({'INFO'}, "Button wurde gedrückt!")
+        if bpy.context.object["SW_PARAM"] == -1:
+            Switch = "SW_PARAM"
+            GiveFreeSwitchID(Switch, True)
+        return {'FINISHED'}
+        
 ###Substarters
 
 class GalaxyMapAddGravity_Planar(bpy.types.Operator):
@@ -6806,7 +7194,7 @@ class GalaxyMap_AddObjProps(bpy.types.Operator):
     bl_label = "General object" 
     def execute(self, context):
     
-        bpy.context.object["Object Name"] = ""
+        #bpy.context.object["Object Name"] = ""
         bpy.context.object["Link ID"] = 0
         bpy.context.object["Obj_Arg0"] = -1
         bpy.context.object["Obj_Arg1"] = -1
@@ -6844,7 +7232,7 @@ class GalaxyMap_AddMapPartProps(bpy.types.Operator):
     bl_label = "Map Part Object" 
     def execute(self, context):
     
-        bpy.context.object["Object Name"] = ""
+        #bpy.context.object["Object Name"] = ""
         bpy.context.object["Link ID"] = -1
         bpy.context.object["MoveConditionType"] = 0
         bpy.context.object["RotateSpeed"] = 0
@@ -6888,11 +7276,39 @@ class GalaxyMap_AddMapPartProps(bpy.types.Operator):
 
 ###LAYOUT -----------------------------------------------------
 
+def get_selected_spline_point():
+    obj = bpy.context.active_object
+    if obj and obj.type == 'CURVE':
+        curve = obj.data
+        for spline in curve.splines:
+            for i, point in enumerate(spline.points if spline.type == 'NURBS' else spline.bezier_points):
+                if point.select_control_point:
+                    return point, spline.type
+    return None, None
+
+def get_selected_spline_pointid():
+    obj = bpy.context.active_object
+    if obj and obj.type == 'CURVE' and obj.data.splines:
+        for spline in obj.data.splines:
+            for i, point in enumerate(spline.bezier_points):  # Für Bezier-Kurven
+                if point.select_control_point:
+                    return i  # Gibt den Index des gewählten Punktes zurück
+            for i, point in enumerate(spline.points):  # Für normale Splines
+                if point.select:
+                    return i
+    return None
+
+import re
+
+def get_base_object_name(objname):
+    return re.sub(r"\.\d{3}$", "", objname) if objname else ""
+    
+    
 class LayoutSMGMapPanel(bpy.types.Panel):
 
 
     """Creates a Panel in the scene context of the properties editor"""
-    bl_label = "Mario Galaxy - Map Tools"
+    bl_label = "Map Tools"
     bl_idname = "SCENE_GalaxyMapTool_layout" 
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -6910,6 +7326,8 @@ class LayoutSMGMapPanel(bpy.types.Panel):
         if not "Object Type" in bpy.context.workspace:
             bpy.context.workspace["Object Type"] = 0
 
+        if not "Add this object" in bpy.context.workspace:
+            bpy.context.workspace["Add this object"] = ""
         ### Initialize paths for tools:
         if not "WiiExplorer Folder Path" in bpy.context.workspace:
             bpy.context.workspace["WiiExplorer Folder Path"] = "C:/WiiExplorer.V1.5.0.5/"
@@ -6923,8 +7341,10 @@ class LayoutSMGMapPanel(bpy.types.Panel):
             bpy.context.workspace["Map Assets Blend file"] = "C:/GalaxyMapAssets.blend"
         if not "Workspace (for searching in Blend files)" in bpy.context.workspace:
             bpy.context.workspace["Workspace (for searching in Blend files)"] = "C:/MyBlenderFiles/"
+        if not "Object Database" in bpy.context.workspace:
+            bpy.context.workspace["Object Database"] = "C:/Whitehole/objectdb.xml"
 
-
+        
         #Layout Name Stuff:
         for col in bpy.data.collections:
             if "World Number" in col:
@@ -6937,13 +7357,36 @@ class LayoutSMGMapPanel(bpy.types.Panel):
         else:
             LayoutMapZoneName = "No valid Zone selected"
 
-
+        #Panel Settings:
+        if "Display Notes from SMG Database" not in bpy.context.workspace:
+            bpy.context.workspace["Display Notes from SMG Database"] = True
 
 
         #WiiExplorerPathFolder
         #CameraEditorPath
         layout = self.layout
         scene = context.scene
+        
+        
+        layout.label(text="EXPORT")
+        
+        split = layout.split() #Splitte Rows
+        # First column
+        col = split.column(align=False)
+        col.scale_y = 1.5
+        col.operator("objecto.galaxymap_operator3", icon='EXPORT')
+        col.operator("objectu.galaxymap_operator4", icon='EXPORT')
+        # Second column
+        col = split.column(align=False)
+        col.scale_y = 1.5
+        col.label(text="EXPORT: " + LayoutMapName)
+        col.label(text="EXPORT: " + LayoutMapZoneName)
+        
+        
+        
+        row = layout.row()
+        row.scale_y = 1.2
+        row.operator("objecthihi.galaxymap_operator8", icon='EXPORT') 
         
         
         layout.label(text="IMPORT")
@@ -6965,48 +7408,26 @@ class LayoutSMGMapPanel(bpy.types.Panel):
         row = layout.prop(bpy.context.workspace, '["Asset Searching Enabled"]', icon='VIEWZOOM')
 
 
-        layout.label(text="EXPORT")
-        
-        split = layout.split() #Splitte Rows
-        # First column
-        col = split.column(align=False)
-        col.scale_y = 1.5
-        col.operator("objecto.galaxymap_operator3", icon='EXPORT')
-        col.operator("objectu.galaxymap_operator4", icon='EXPORT')
-        # Second column
-        col = split.column(align=False)
-        col.scale_y = 1.5
-        col.label(text="EXPORT: " + LayoutMapName)
-        col.label(text="EXPORT: " + LayoutMapZoneName)
-        
-        
-        
-        row = layout.row()
-        row.scale_y = 1.2
-        row.operator("objecthihi.galaxymap_operator8", icon='EXPORT') 
+
 		
         row = layout.row()
         row.scale_y = 2
         
         layout.label(text="Create New")
-        row = layout.row()
-        row.operator("objecta.galaxymap_operator5", icon='ADD') #new zone
-        row = layout.row()
-        row.operator("objectbla.galaxymap_operator9", icon='PLUS') #new galaxy
-        row = layout.row()
-        row.operator("objectbob.galaxymap_operator10", icon='RNA_ADD') #new mission
+
+        col = layout.column(align=True)  # Sorgt dafür, dass die Buttons direkt aufeinanderliegen
+        col.operator("objecta.galaxymap_operator5", icon='ADD')  # New Zone
+        col.operator("objectbla.galaxymap_operator9", icon='PLUS')  # New Galaxy
+        col.operator("objectbob.galaxymap_operator10", icon='RNA_ADD')  # New Mission
+
 
         
         layout.label(text="Map Tools")
-        row = layout.row()
-        row.scale_y = 1.2
-        row.operator("objectwerf.galaxymap_layoutstarter2", icon='PLUS') #Add object        
-        row = layout.row()
-        row.scale_y = 1.2
-        row.operator("galaxymaplayout4.layoutstarter4", icon='MOD_LINEART') #change area shape
-        row = layout.row()
-        row.scale_y = 1.2
-        row.operator("objecte.galaxymap_operator7", icon='VIS_SEL_11') #update layer info
+        col = layout.column(align=True)
+        col.operator("objectwerf.galaxymap_layoutstarter2", icon='PLUS') #Add object        
+        col.operator("galaxymaplayout4.layoutstarter4", icon='MOD_LINEART') #change area shape
+        col.operator("objecte.galaxymap_operator7", icon='VIS_SEL_11') #update layer info
+        col.prop(bpy.context.workspace, '["Add this object"]')
         split = layout.split() #Splitte Rows
         col = split.column(align=True)
         col.operator("objecty.galaxymap_operator6", icon='CAMERA_DATA') #camera edit
@@ -7015,17 +7436,14 @@ class LayoutSMGMapPanel(bpy.types.Panel):
 
         
         layout.label(text="Paths")
-        row = layout.row()
-        row = layout.prop(bpy.context.workspace, '["StageData Folder Path"]')
-        row = layout.row()
-        row = layout.prop(bpy.context.workspace, '["Map Assets Blend file"]')
-        row = layout.row()
-        row = layout.prop(bpy.context.workspace, '["WiiExplorer Folder Path"]')
-        row = layout.row()
-        row = layout.prop(bpy.context.workspace, '["LaunchCamPlus Folder Path"]')
-        row = layout.row()
-        row = layout.prop(bpy.context.workspace, '["Workspace (for searching in Blend files)"]')
-    
+        col = layout.column(align=True)
+        col.prop(bpy.context.workspace, '["StageData Folder Path"]')
+        col.prop(bpy.context.workspace, '["Map Assets Blend file"]')
+        col.prop(bpy.context.workspace, '["WiiExplorer Folder Path"]')
+        col.prop(bpy.context.workspace, '["LaunchCamPlus Folder Path"]')
+        col.prop(bpy.context.workspace, '["Workspace (for searching in Blend files)"]')
+        col.prop(bpy.context.workspace, '["Object Database"]')
+
         layout.label(text="Asset Tools")
         row = layout.row()
         row.scale_y = 1.2
@@ -7035,252 +7453,267 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
 
 
     """Creates a Panel in the scene context of the properties editor"""
-    bl_label = "Mario Galaxy - Object Settings"
+    bl_label = "Object Settings"
     bl_idname = "SCENE_GalaxyMapObject_layout" 
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "Mario Galaxy"
 
     def draw(self, context): #General Object
+    
+        obj = context.object
+        if obj is None:
+            layout.label(text="No Objekt selected")
+            return
+    
+        
         ### Initialize Name Slots for entering names:
         if "Model ID" in bpy.context.object:
             if not "RotateAccelType" in bpy.context.object:
                 layout = self.layout
                 scene = context.scene
                 
+                ### ARGUMENT NAMEN AUS OBJEKT DATABASE NEHMEN
                 
-                layout.label(text="General")
-                split = layout.split() #Splitte Rows
-                col = split.column(align=True)
-                col.label(text="Alternative Name:")
-                col = split.column(align=True)
-                col.prop(bpy.context.object, '["Object Name"]')
+                obj = context.object
+
+                if obj is None:
+                    layout.label(text="Kein Objekt ausgewählt")
+                    return
+                
+                if obj.instance_collection == None:
+                    #obj_name = (obj["Object Name"]) #Nehme Text aus der 'Object Name' property    
+                    #obj_name = obj.get("Object Name", "Unknown")
+                    obj_name = get_base_object_name(obj.name)
+
+                else:
+                    obj_name = (obj.instance_collection.name) #Nehme Namen der Collection als Objektnamen
+                    #obj_name = obj.get(instance_collection.name, "Unknown")
+                
+                #obj_name = obj.get("Object Name", "Unknown")
+                
+                display_name, labels, notes = load_labels_from_xml(obj_name, 8, False)
+                ##########
+                
+                layout.label(text=f"--- {display_name} ---")
+                layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+                if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                    if notes:
+                        import textwrap
+                        #layout.label(text="Notes:")
+                        #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                        
+                        layout.label(text="Notes:")
+                        box = layout.box()
+                        lines = notes.split("\n")
+                        #lines2= ArgInfo.split("\n")
+                        col = box.column(align=True)
+                        for line in lines:
+                            words = line.split()
+                            wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                            
+                            for wrapped_line in wrapped_lines:
+                                col.label(text=wrapped_line)
+                    
+
+                    
                 row = layout.row()
                 row.scale_y = 1.2
                 row = layout.prop(bpy.context.object, '["Layer"]')
                 
                 
                 layout.label(text="Settings")
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Link ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Model ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Path ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Camera Set ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Message ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Speed Scale"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Generator Object ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Linked Object ID]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Linked MapParts ID"]')
+                col = layout.column(align=True)
+                col.prop(bpy.context.object, '["Link ID"]')
+                col.prop(bpy.context.object, '["Model ID"]')
+                col.prop(bpy.context.object, '["Path ID"]')
+                col.prop(bpy.context.object, '["Camera Set ID"]')
+                col.prop(bpy.context.object, '["Message ID"]')
+                col.prop(bpy.context.object, '["Speed Scale"]')
+                col.prop(bpy.context.object, '["Generator Object ID"]')
+                col.prop(bpy.context.object, '["Linked Object ID]')
+                col.prop(bpy.context.object, '["Linked MapParts ID"]')
                 
+
                 layout.label(text="Arguments")
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg0"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg1"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg2"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg3"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg4"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg5"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg6"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg7"]')
+                col = layout.column(align=True)
+                for i in range(len(labels)):
+                    col.prop(obj, f'["Obj_Arg{i}"]', text=labels[i])
+                
+
                 
                 layout.label(text="Switches")
                 row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_APPEAR"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_DEAD"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_A"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_B"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_AWAKE"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_PARAM"]')
-                
+                row.alignment = 'LEFT'
+                # Erste Spalte für die SW-Werte (größer)
+                col1 = row.column(align=True)
+                col1.scale_x = 2  # Macht die erste Spalte etwas größer
+                col1.prop(context.object, '["SW_APPEAR"]', text="SW_APPEAR")
+                col1.prop(context.object, '["SW_DEAD"]', text="SW_DEAD")
+                col1.prop(context.object, '["SW_A"]', text="SW_A")
+                col1.prop(context.object, '["SW_B"]', text="SW_B")
+                col1.prop(context.object, '["SW_AWAKE"]', text="SW_AWAKE")
+                col1.prop(context.object, '["SW_PARAM"]', text="SW_PARAM")
+
+                # Geteilte Spalten für Z und G
+                split = row.split(factor=0.35)  # Teilt den verbleibenden Platz
+                col2 = split.column(align=True)
+                col2.scale_x = 1
+                col2.operator("galaxymap203.galaxyaddswitchappear", text="Z")
+                col2.operator("galaxymap204.galaxyaddswitchdead", text="Z")
+                col2.operator("galaxymap201.galaxyaddswitcha", text="Z")
+                col2.operator("galaxymap202.galaxyaddswitchb", text="Z")
+                col2.operator("galaxymap205.galaxyaddswitchawake", text="Z")
+                col2.operator("galaxymap206.galaxyaddswitchparam", text="Z")
+
+                col3 = split.column(align=True)
+                col3.scale_x = 0.004
+                col3.operator("galaxymap303.galaxyaddswitchappearfull", text="G")
+                col3.operator("galaxymap304.galaxyaddswitchdeadfull", text="G")
+                col3.operator("galaxymap301.galaxyaddswitchafull", text="G")
+                col3.operator("galaxymap302.galaxyaddswitchbfull", text="G")
+                col3.operator("galaxymap305.galaxyaddswitchawakefull", text="G")
+                col3.operator("galaxymap306.galaxyaddswitchparamfull", text="G")
+
+
                 layout.label(text="Groups")
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Group ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Clipping Group ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["View Group ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Cutscene Group ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Cast Group ID"]')
+                col = layout.column(align=True)
+                col.prop(bpy.context.object, '["Group ID"]')
+                col.prop(bpy.context.object, '["Clipping Group ID"]')
+                col.prop(bpy.context.object, '["View Group ID"]')
+                col.prop(bpy.context.object, '["Cutscene Group ID"]')
+                col.prop(bpy.context.object, '["Cast Group ID"]')
 
 #    def draw(self, context): #MapPart Object
         if "RotateStopTime" in bpy.context.object:
             layout = self.layout
             scene = context.scene
             
+            ### ARGUMENT NAMEN AUS OBJEKT DATABASE NEHMEN
             
-            layout.label(text="General")
-            split = layout.split() #Splitte Rows
-            col = split.column(align=True)
-            col.label(text="Alternative Name:")
-            col = split.column(align=True)
-            col.prop(bpy.context.object, '["Object Name"]')
+            obj = context.object
+
+            if obj is None:
+                layout.label(text="Kein Objekt ausgewählt")
+                return
+            
+            if obj.instance_collection == None:
+                obj_name = get_base_object_name(obj.name)
+            else:
+                obj_name = (obj.instance_collection.name) #Nehme Namen der Collection als Objektnamen
+                #obj_name = obj.get(instance_collection.name, "Unknown")
+            
+            #obj_name = obj.get("Object Name", "Unknown")
+            
+            display_name, labels, notes = load_labels_from_xml(obj_name, 8, False)
+            ##########
+            layout.label(text=f"--- {display_name} ---")
+            layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+            if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                if notes:
+                    import textwrap
+                    #layout.label(text="Notes:")
+                    #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                    
+                    layout.label(text="Notes:")
+                    box = layout.box()
+                    lines = notes.split("\n")
+                    
+                    col = box.column(align=True)
+                    for line in lines:
+                        words = line.split()
+                        wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                        
+                        for wrapped_line in wrapped_lines:
+                            col.label(text=wrapped_line)
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Layer"]')
             
             
             layout.label(text="MapPart Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["MoveConditionType"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["RotateSpeed"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["RotateAngle"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["RotateAxis"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["RotateAccelType"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["RotateStopTime"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["RotateType"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["ShadowType]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SignMotionType"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PressType"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["FarClip"]')
+            col = layout.column(align=True)
+            col.prop(bpy.context.object, '["MoveConditionType"]')
+            col.prop(bpy.context.object, '["RotateSpeed"]')
+            col.prop(bpy.context.object, '["RotateAngle"]')
+            col.prop(bpy.context.object, '["RotateAxis"]')
+            col.prop(bpy.context.object, '["RotateAccelType"]')
+            col.prop(bpy.context.object, '["RotateStopTime"]')
+            col.prop(bpy.context.object, '["RotateType"]')
+            col.prop(bpy.context.object, '["ShadowType]')
+            col.prop(bpy.context.object, '["SignMotionType"]')
+            col.prop(bpy.context.object, '["PressType"]')
+            col.prop(bpy.context.object, '["FarClip"]')
             
+            # layout.label(text="Arguments")
+            # col = layout.column(align=True)
+            # col.prop(bpy.context.object, '["Obj_Arg0"]')
+            # col.prop(bpy.context.object, '["Obj_Arg1"]')
+            # col.prop(bpy.context.object, '["Obj_Arg2"]')
+            # col.prop(bpy.context.object, '["Obj_Arg3"]')
+            
+
+
             layout.label(text="Arguments")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Obj_Arg0"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Obj_Arg1"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Obj_Arg2"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Obj_Arg3"]')
+            
+            col = layout.column(align=True)
+            for i in range(len(labels)):
+                col.prop(obj, f'["Obj_Arg{i}"]', text=labels[i])
+            
+
 
             layout.label(text="Switches")
             row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_APPEAR"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_DEAD"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_A"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_B"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_AWAKE"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_PARAM"]')
+            row.alignment = 'LEFT'
+            # Erste Spalte für die SW-Werte (größer)
+            col1 = row.column(align=True)
+            col1.scale_x = 2  # Macht die erste Spalte etwas größer
+            col1.prop(context.object, '["SW_APPEAR"]', text="SW_APPEAR")
+            col1.prop(context.object, '["SW_DEAD"]', text="SW_DEAD")
+            col1.prop(context.object, '["SW_A"]', text="SW_A")
+            col1.prop(context.object, '["SW_B"]', text="SW_B")
+            col1.prop(context.object, '["SW_AWAKE"]', text="SW_AWAKE")
+            col1.prop(context.object, '["SW_PARAM"]', text="SW_PARAM")
+
+            # Geteilte Spalten für Z und G
+            split = row.split(factor=0.35)  # Teilt den verbleibenden Platz
+            col2 = split.column(align=True)
+            col2.scale_x = 1
+            col2.operator("galaxymap203.galaxyaddswitchappear", text="Z")
+            col2.operator("galaxymap204.galaxyaddswitchdead", text="Z")
+            col2.operator("galaxymap201.galaxyaddswitcha", text="Z")
+            col2.operator("galaxymap202.galaxyaddswitchb", text="Z")
+            col2.operator("galaxymap205.galaxyaddswitchawake", text="Z")
+            col2.operator("galaxymap206.galaxyaddswitchparam", text="Z")
+
+            col3 = split.column(align=True)
+            col3.scale_x = 0.004
+            col3.operator("galaxymap303.galaxyaddswitchappearfull", text="G")
+            col3.operator("galaxymap304.galaxyaddswitchdeadfull", text="G")
+            col3.operator("galaxymap301.galaxyaddswitchafull", text="G")
+            col3.operator("galaxymap302.galaxyaddswitchbfull", text="G")
+            col3.operator("galaxymap305.galaxyaddswitchawakefull", text="G")
+            col3.operator("galaxymap306.galaxyaddswitchparamfull", text="G")
             
             layout.label(text="Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Link ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Model ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Path ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Camera Set ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Speed Scale"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Parent Object ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Linked Object ID]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Linked MapParts ID"]')
+            col = layout.column(align=True)
+            col.prop(bpy.context.object, '["Link ID"]')
+            col.prop(bpy.context.object, '["Model ID"]')
+            col.prop(bpy.context.object, '["Path ID"]')
+            col.prop(bpy.context.object, '["Camera Set ID"]')
+            col.prop(bpy.context.object, '["Speed Scale"]')
+            col.prop(bpy.context.object, '["Parent Object ID"]')
+            col.prop(bpy.context.object, '["Linked Object ID]')
+            col.prop(bpy.context.object, '["Linked MapParts ID"]')
             
 
             layout.label(text="Groups")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Group ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Clipping Group ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["View Group ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Cutscene Group ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Cast Group ID"]')
+            col = layout.column(align=True)
+            col.prop(bpy.context.object, '["Group ID"]')
+            col.prop(bpy.context.object, '["Clipping Group ID"]')
+            col.prop(bpy.context.object, '["View Group ID"]')
+            col.prop(bpy.context.object, '["Cutscene Group ID"]')
+            col.prop(bpy.context.object, '["Cast Group ID"]')
 
 #    def draw(self, context): #Area
         ### Initialize Name Slots for entering names:
@@ -7290,13 +7723,40 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
                     layout = self.layout
                     scene = context.scene
                     
+                    ### ARGUMENT NAMEN AUS OBJEKT DATABASE NEHMEN
                     
-                    layout.label(text="General")
-                    split = layout.split() #Splitte Rows
-                    col = split.column(align=True)
-                    col.label(text="Alternative Name:")
-                    col = split.column(align=True)
-                    col.prop(bpy.context.object, '["Object Name"]')
+                    obj = context.object
+
+                    if obj is None:
+                        layout.label(text="Kein Objekt ausgewählt")
+                        return
+                    
+                    #obj_name = obj.get("Object Name", "Unknown")
+                    obj_name = get_base_object_name(obj.name)
+                    
+                    display_name, labels, notes = load_labels_from_xml(obj_name, 8, False)
+                    ##########
+                    layout.label(text=f"--- {display_name} ---")
+                    
+                    layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+                    if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                        if notes:
+                            import textwrap
+                            #layout.label(text="Notes:")
+                            #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                            
+                            layout.label(text="Notes:")
+                            box = layout.box()
+                            lines = notes.split("\n")
+                            
+                            col = box.column(align=True)
+                            for line in lines:
+                                words = line.split()
+                                wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                                
+                                for wrapped_line in wrapped_lines:
+                                    col.label(text=wrapped_line)
+                    
                     row = layout.row()
                     row.scale_y = 1.2
                     row = layout.prop(bpy.context.object, '["Layer"]')
@@ -7306,75 +7766,66 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
                     row = layout.row()
                     row.scale_y = 1.2
                     row.operator("galaxymaplayout4.layoutstarter4", icon='MOD_LINEART') #change area shape
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Link ID"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Path ID"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Priority"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Linked Area ID"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Linked Object ID]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Linked MapParts ID"]')
+                    col = layout.column(align=True) 
+                    col.prop(bpy.context.object, '["Link ID"]')
+                    col.prop(bpy.context.object, '["Path ID"]')
+                    col.prop(bpy.context.object, '["Priority"]')
+                    col.prop(bpy.context.object, '["Linked Area ID"]')
+                    col.prop(bpy.context.object, '["Linked Object ID"]')
+                    col.prop(bpy.context.object, '["Linked MapParts ID"]')
                     
+                    # layout.label(text="Arguments")
+                    # col = layout.column(align=True) 
+                    # col.prop(bpy.context.object, '["Obj_Arg0"]')
+                    # col.prop(bpy.context.object, '["Obj_Arg1"]')
+                    # col.prop(bpy.context.object, '["Obj_Arg2"]')
+                    # col.prop(bpy.context.object, '["Obj_Arg3"]')
+                    # col.prop(bpy.context.object, '["Obj_Arg4"]')
+                    # col.prop(bpy.context.object, '["Obj_Arg5"]')
+                    # col.prop(bpy.context.object, '["Obj_Arg6"]')
+                    # col.prop(bpy.context.object, '["Obj_Arg7"]')
+                    
+
                     layout.label(text="Arguments")
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg0"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg1"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg2"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg3"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg4"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg5"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg6"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Obj_Arg7"]')
+                    
+                    col = layout.column(align=True)
+                    for i in range(len(labels)):
+                        col.prop(obj, f'["Obj_Arg{i}"]', text=labels[i])
+                    
+
                     
                     layout.label(text="Switches")
                     row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["SW_APPEAR"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["SW_A"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["SW_B"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["SW_AWAKE"]')
+                    row.alignment = 'LEFT'
+                    # Erste Spalte für die SW-Werte (größer)
+                    col1 = row.column(align=True)
+                    col1.scale_x = 2  # Macht die erste Spalte etwas größer
+                    col1.prop(context.object, '["SW_APPEAR"]', text="SW_APPEAR")
+                    col1.prop(context.object, '["SW_A"]', text="SW_A")
+                    col1.prop(context.object, '["SW_B"]', text="SW_B")
+                    col1.prop(context.object, '["SW_AWAKE"]', text="SW_AWAKE")
+
+                    # Geteilte Spalten für Z und G
+                    split = row.split(factor=0.35)  # Teilt den verbleibenden Platz
+                    col2 = split.column(align=True)
+                    col2.scale_x = 1
+                    col2.operator("galaxymap203.galaxyaddswitchappear", text="Z")
+                    col2.operator("galaxymap201.galaxyaddswitcha", text="Z")
+                    col2.operator("galaxymap202.galaxyaddswitchb", text="Z")
+                    col2.operator("galaxymap205.galaxyaddswitchawake", text="Z")
+
+                    col3 = split.column(align=True)
+                    col3.scale_x = 0.004
+                    col3.operator("galaxymap303.galaxyaddswitchappearfull", text="G")
+                    col3.operator("galaxymap301.galaxyaddswitchafull", text="G")
+                    col3.operator("galaxymap302.galaxyaddswitchbfull", text="G")
+                    col3.operator("galaxymap305.galaxyaddswitchawakefull", text="G")
                     
                     layout.label(text="Groups")
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Group ID"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Clipping Group ID"]')
-                    row = layout.row()
-                    row.scale_y = 1.2
-                    row = layout.prop(bpy.context.object, '["Cutscene Group ID"]')
+                    col = layout.column(align=True) 
+                    col.prop(bpy.context.object, '["Group ID"]')
+                    col.prop(bpy.context.object, '["Clipping Group ID"]')
+                    col.prop(bpy.context.object, '["Cutscene Group ID"]')
 
 #    def draw(self, context): #Camera Area
         ### Initialize Name Slots for entering names:
@@ -7383,13 +7834,29 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
                 layout = self.layout
                 scene = context.scene
                 
+                display_name, labels, notes = load_labels_from_xml("CameraArea", 8, False)
+                ##########
                 
-                layout.label(text="General")
-                split = layout.split() #Splitte Rows
-                col = split.column(align=True)
-                col.label(text="Alternative Name:")
-                col = split.column(align=True)
-                col.prop(bpy.context.object, '["Object Name"]')
+                layout.label(text=f"--- {display_name} ---")
+                layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+                if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                    if notes:
+                        import textwrap
+                        #layout.label(text="Notes:")
+                        #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                        
+                        layout.label(text="Notes:")
+                        box = layout.box()
+                        lines = notes.split("\n")
+                        
+                        col = box.column(align=True)
+                        for line in lines:
+                            words = line.split()
+                            wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                            
+                            for wrapped_line in wrapped_lines:
+                                col.label(text=wrapped_line)
+                
                 row = layout.row()
                 row.scale_y = 1.2
                 row = layout.prop(bpy.context.object, '["Layer"]')
@@ -7399,49 +7866,47 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
                 row = layout.row()
                 row.scale_y = 1.2
                 row.operator("galaxymaplayout4.layoutstarter4", icon='MOD_LINEART') #change area shape
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Link ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Validity"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Linked Area ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Linked Object ID]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Linked MapParts ID"]')
+                col = layout.column(align=True) 
+                col.prop(bpy.context.object, '["Link ID"]')
+                col.prop(bpy.context.object, '["Linked Area ID"]')
+                col.prop(bpy.context.object, '["Linked Object ID]')
+                col.prop(bpy.context.object, '["Linked MapParts ID"]')
+                col.prop(bpy.context.object, '["Validity"]')
                 
                 layout.label(text="Arguments")
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Camera ID"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Obj_Arg1"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Priority"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["Affected Contexts"]')
+                col = layout.column(align=True) 
+                col.prop(bpy.context.object, '["Camera ID"]')
+                col.prop(bpy.context.object, '["Obj_Arg1"]')
+                col.prop(bpy.context.object, '["Priority"]')
+                col.prop(bpy.context.object, '["Affected Contexts"]')
                 
                 layout.label(text="Switches")
                 row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_APPEAR"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_A"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_B"]')
-                row = layout.row()
-                row.scale_y = 1.2
-                row = layout.prop(bpy.context.object, '["SW_AWAKE"]')
+                row.alignment = 'LEFT'
+                # Erste Spalte für die SW-Werte (größer)
+                col1 = row.column(align=True)
+                col1.scale_x = 2  # Macht die erste Spalte etwas größer
+                col1.prop(context.object, '["SW_APPEAR"]', text="SW_APPEAR")
+                col1.prop(context.object, '["SW_A"]', text="SW_A")
+                col1.prop(context.object, '["SW_B"]', text="SW_B")
+                col1.prop(context.object, '["SW_AWAKE"]', text="SW_AWAKE")
+
+                # Geteilte Spalten für Z und G
+                split = row.split(factor=0.35)  # Teilt den verbleibenden Platz
+                col2 = split.column(align=True)
+                col2.scale_x = 1
+                col2.operator("galaxymap203.galaxyaddswitchappear", text="Z")
+                col2.operator("galaxymap201.galaxyaddswitcha", text="Z")
+                col2.operator("galaxymap202.galaxyaddswitchb", text="Z")
+                col2.operator("galaxymap205.galaxyaddswitchawake", text="Z")
+
+                col3 = split.column(align=True)
+                col3.scale_x = 0.004
+                col3.operator("galaxymap303.galaxyaddswitchappearfull", text="G")
+                col3.operator("galaxymap301.galaxyaddswitchafull", text="G")
+                col3.operator("galaxymap302.galaxyaddswitchbfull", text="G")
+                col3.operator("galaxymap305.galaxyaddswitchawakefull", text="G")
+
 
 #    def draw(self, context): #Spawns
         ### Initialize Name Slots for entering names:
@@ -7449,26 +7914,40 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             layout = self.layout
             scene = context.scene
             
+            display_name, labels, notes = load_labels_from_xml("Mario", 8, False)
+            ##########
             
-            layout.label(text="General")
+            layout.label(text=f"--- {display_name} ---")
+            layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+            if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                if notes:
+                    import textwrap
+                    #layout.label(text="Notes:")
+                    #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                    
+                    layout.label(text="Notes:")
+                    box = layout.box()
+                    lines = notes.split("\n")
+                    
+                    col = box.column(align=True)
+                    for line in lines:
+                        words = line.split()
+                        wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                        
+                        for wrapped_line in wrapped_lines:
+                            col.label(text=wrapped_line)
+            
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Layer"]')
             
             
             layout.label(text="Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Entrance Type"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Spawn ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Camera ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Camera Set ID"]')
+            col = layout.column(align=True) 
+            col.prop(bpy.context.object, '["Entrance Type"]')
+            col.prop(bpy.context.object, '["Spawn ID"]')
+            col.prop(bpy.context.object, '["Camera ID"]')
+            col.prop(bpy.context.object, '["Camera Set ID"]')
 
 #    def draw(self, context): #Cutscenes
         ### Initialize Name Slots for entering names:
@@ -7476,45 +7955,78 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             layout = self.layout
             scene = context.scene
             
+            ### ARGUMENT NAMEN AUS OBJEKT DATABASE NEHMEN
             
-            layout.label(text="General")
-            split = layout.split() #Splitte Rows
-            col = split.column(align=True)
-            col.label(text="Alternative Name:")
-            col = split.column(align=True)
-            col.prop(bpy.context.object, '["Object Name"]')
+            obj = context.object
+
+            if obj is None:
+                layout.label(text="Kein Objekt ausgewählt")
+                return
+               
+            #obj_name = obj.get("Object Name", "Unknown")
+            obj_name = get_base_object_name(obj.name)
+            
+            display_name, labels, notes = load_labels_from_xml(obj_name, 8, False)
+            ##########
+            
+            layout.label(text=f"--- {display_name} ---")
+            layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+            if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                if notes:
+                    import textwrap
+                    #layout.label(text="Notes:")
+                    #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                    
+                    layout.label(text="Notes:")
+                    box = layout.box()
+                    lines = notes.split("\n")
+                    
+                    col = box.column(align=True)
+                    for line in lines:
+                        words = line.split()
+                        wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                        
+                        for wrapped_line in wrapped_lines:
+                            col.label(text=wrapped_line)
+            
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Layer"]')
             
             layout.label(text="Switches")
             row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_APPEAR"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_DEAD"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_A"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["SW_B"]')
+            row.alignment = 'LEFT'
+            # Erste Spalte für die SW-Werte (größer)
+            col1 = row.column(align=True)
+            col1.scale_x = 2  # Macht die erste Spalte etwas größer
+            col1.prop(context.object, '["SW_APPEAR"]', text="SW_APPEAR")
+            col1.prop(context.object, '["SW_DEAD"]', text="SW_DEAD")
+            col1.prop(context.object, '["SW_A"]', text="SW_A")
+            col1.prop(context.object, '["SW_B"]', text="SW_B")
+
+            # Geteilte Spalten für Z und G
+            split = row.split(factor=0.35)  # Teilt den verbleibenden Platz
+            col2 = split.column(align=True)
+            col2.scale_x = 1
+            col2.operator("galaxymap203.galaxyaddswitchappear", text="Z")
+            col2.operator("galaxymap204.galaxyaddswitchdead", text="Z")
+            col2.operator("galaxymap201.galaxyaddswitcha", text="Z")
+            col2.operator("galaxymap202.galaxyaddswitchb", text="Z")
+
+            col3 = split.column(align=True)
+            col3.scale_x = 0.004
+            col3.operator("galaxymap303.galaxyaddswitchappearfull", text="G")
+            col3.operator("galaxymap304.galaxyaddswitchdeadfull", text="G")
+            col3.operator("galaxymap301.galaxyaddswitchafull", text="G")
+            col3.operator("galaxymap302.galaxyaddswitchbfull", text="G")
 
             
             layout.label(text="Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Link ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Cutscene Name"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Sheet Name"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Skippable"]')
+            col = layout.column(align=True) 
+            col.prop(bpy.context.object, '["Cutscene Name"]')
+            col.prop(bpy.context.object, '["Sheet Name"]')
+            col.prop(bpy.context.object, '["Skippable"]')
+            col.prop(bpy.context.object, '["Link ID"]')
 
 #    def draw(self, context): #Positions
         ### Initialize Name Slots for entering names:
@@ -7522,24 +8034,48 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             layout = self.layout
             scene = context.scene
             
+            ### ARGUMENT NAMEN AUS OBJEKT DATABASE NEHMEN
             
-            layout.label(text="General")
-            split = layout.split() #Splitte Rows
-            col = split.column(align=True)
-            col.label(text="Alternative Name:")
-            col = split.column(align=True)
-            col.prop(bpy.context.object, '["Object Name"]')
+            obj = context.object
+
+            if obj is None:
+                layout.label(text="Kein Objekt ausgewählt")
+                return
+              
+            #obj_name = obj.get("Object Name", "Unknown")
+            obj_name = get_base_object_name(obj.name)
+            
+            display_name, labels, notes = load_labels_from_xml(obj_name, 8, False)
+            ##########
+            
+            layout.label(text=f"--- {display_name} ---")
+            layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+            if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                if notes:
+                    import textwrap
+                    #layout.label(text="Notes:")
+                    #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                    
+                    layout.label(text="Notes:")
+                    box = layout.box()
+                    lines = notes.split("\n")
+                    
+                    col = box.column(align=True)
+                    for line in lines:
+                        words = line.split()
+                        wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                        
+                        for wrapped_line in wrapped_lines:
+                            col.label(text=wrapped_line)
+            
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Layer"]')
             
             layout.label(text="Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Position Name"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Linked Object ID"]')
+            col = layout.column(align=True) 
+            col.prop(bpy.context.object, '["Position Name"]')
+            col.prop(bpy.context.object, '["Linked Object ID"]')
             
 #    def draw(self, context): #Debug
         ### Initialize Name Slots for entering names:
@@ -7549,12 +8085,6 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
                 scene = context.scene
             
             
-                layout.label(text="General")
-                split = layout.split() #Splitte Rows
-                col = split.column(align=True)
-                col.label(text="Alternative Name:")
-                col = split.column(align=True)
-                col.prop(bpy.context.object, '["Object Name"]')
                 row = layout.row()
                 row.scale_y = 1.2
                 row = layout.prop(bpy.context.object, '["Layer"]')
@@ -7571,15 +8101,6 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             scene = context.scene
             
             
-            layout.label(text="General")
-            split = layout.split() #Splitte Rows
-            col = split.column(align=True)
-            col.label(text="Alternative Name:")
-            col = split.column(align=True)
-            col.prop(bpy.context.object, '["Object Name"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Layer"]')
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Layer"]') #ID muss noch
@@ -7589,38 +8110,133 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             row = layout.prop(bpy.context.object, '["Usage"]')
             
             layout.label(text="Path Arguments")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg0 (Posture Type)"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg1 (Stop Motion Type)"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg2 (Guide Type)"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg3"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg4 (Initial Position Type)"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg5"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg6"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["PathArg7"]')
+            col = layout.column(align=True)
+            col.prop(bpy.context.object, '["PathArg0 (Posture Type)"]', text="Posture Type")
+            col.prop(bpy.context.object, '["PathArg1 (Stop Motion Type)"]', text="Posture Type")
+            col.prop(bpy.context.object, '["PathArg2 (Guide Type)"]', text="Guide Type")
+            col.prop(bpy.context.object, '["PathArg3"]')
+            col.prop(bpy.context.object, '["PathArg4 (Initial Position Type)"]', text="Initial Position Type")
+            col.prop(bpy.context.object, '["PathArg5"]')
+            col.prop(bpy.context.object, '["PathArg6"]')
+            col.prop(bpy.context.object, '["PathArg7"]')
             
             layout.label(text="Point Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            row.operator("galaxymap77.galaxyaddpathsetup", icon='MOD_LINEART')
-            layout.label(text="Point Speed is Mean Tilt")
-            layout.label(text="Point Stop Duration is Mean Radius")
+            # row = layout.row()
+            # row.scale_y = 1.2
+            # row.operator("galaxymap77.galaxyaddpathsetup", icon='MOD_LINEART')
             
+            point, spline_type = get_selected_spline_point()
+            if point:
+                index = get_selected_spline_pointid()
+                if index is not None:
+                    layout.label(text=f"[ ID: {index}] ")
+                # Radius Berechnung
+                PointStopArg = -1 if point.radius >= 1.0 else round(float(point.radius) * 10000)  #point.radius * 1000
+                PointSpeedArg = int(round((math.degrees(point.tilt))))
+                
+
+                if str(index) in context.object.modifiers:
+                    if bpy.context.object.modifiers[str(index)]["Input_10"] == 0:
+                        col = layout.column(align=True)
+                        col.label(text="Speed:")
+                        split = layout.split() #Splitte Rows
+                        col = split.column(align=True)
+                        col.prop(point, "tilt", text="Movement Speed", icon="SORTTIME")
+                        col.prop(point, "radius", text="Stop Time", icon="TRACKING_CLEAR_FORWARDS")
+                        col = split.column(align=True)
+                        col.label(text=f"Speed: {PointSpeedArg}")
+                        col.label(text=f"Stop: {PointStopArg}")
+                        col = layout.column(align=True)
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_4"]', icon="SORTTIME", text="Acceleration Time")
+
+                        col.label(text="Rotation:")
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_5"]', text="Speed", icon="MOD_TIME")
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_6"]', text="Angle", icon="TRACKING_REFINE_FORWARDS")
+                        split = layout.split() #Splitte Rows
+                        col = split.column(align=True)
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_7"]', text="Axis", icon="CON_ROTLIMIT")
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_9"]', text="Type", icon="TRACKING_BACKWARDS")
+                        col = split.column(align=True)
+                        if bpy.context.object.modifiers[str(index)]["Input_7"] == 0:
+                            col.label(text=f"X Axis")
+                        else:
+                            if bpy.context.object.modifiers[str(index)]["Input_7"] == 1:
+                                col.label(text=f"Y Axis")
+                            else:
+                                if bpy.context.object.modifiers[str(index)]["Input_7"] == 2:
+                                    col.label(text=f"Z Axis")
+                                else:
+                                    col.label(text=f"Axis not set")
+                        if bpy.context.object.modifiers[str(index)]["Input_9"] == -1:
+                            col.label(text=f"Stop and Rotate")
+                        else:
+                            if bpy.context.object.modifiers[str(index)]["Input_9"] == 1:
+                                col.label(text=f"Rotate between points")
+                            else:
+                                col.label(text=f"Tyoe not set")
+                        col = layout.column(align=True)
+                        row = layout.row()
+                        row.scale_y = 1.2
+                        row.prop(bpy.context.object.modifiers[str(index)], '["Input_10"]', text="Speed Type [Speed]", icon="TRACKING_CLEAR_FORWARDS")
+                    else: #1
+                        col = layout.column(align=True)
+                        col.label(text="Speed:")
+                        split = layout.split() #Splitte Rows
+                        col = split.column(align=True)
+                        col.prop(point, "tilt", text="Movement Time", icon="SORTTIME")
+                        col.prop(point, "radius", text="Stop Time", icon="TRACKING_CLEAR_FORWARDS")
+                        col = split.column(align=True)
+                        col.label(text=f"Frames: {PointSpeedArg}")
+                        col.label(text=f"Stop: {PointStopArg}")
+                        col = layout.column(align=True)
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_4"]', icon="SORTTIME", text="Acceleration Time")
+                        col.label(text="Rotation:")
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_5"]', text="Time", icon="MOD_TIME")
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_6"]', text="Angle", icon="TRACKING_REFINE_FORWARDS")
+                        split = layout.split() #Splitte Rows
+                        col = split.column(align=True)
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_7"]', text="Axis", icon="CON_ROTLIMIT")
+                        col.prop(bpy.context.object.modifiers[str(index)], '["Input_9"]', text="Type", icon="TRACKING_BACKWARDS")
+                        col = split.column(align=True)
+                        if bpy.context.object.modifiers[str(index)]["Input_7"] == 0:
+                            col.label(text=f"X Axis")
+                        else:
+                            if bpy.context.object.modifiers[str(index)]["Input_7"] == 1:
+                                col.label(text=f"Y Axis")
+                            else:
+                                if bpy.context.object.modifiers[str(index)]["Input_7"] == 2:
+                                    col.label(text=f"Z Axis")
+                                else:
+                                    col.label(text=f"Axis not set")
+                        if bpy.context.object.modifiers[str(index)]["Input_9"] == -1:
+                            col.label(text=f"Stop and Rotate")
+                        else:
+                            if bpy.context.object.modifiers[str(index)]["Input_9"] == 1:
+                                col.label(text=f"Rotate between points")
+                            else:
+                                col.label(text=f"Tyoe not set")
+                        col = layout.column(align=True)
+                        row = layout.row()
+                        row.scale_y = 1.2
+                        row.prop(bpy.context.object.modifiers[str(index)], '["Input_10"]', text="Speed Type [Time]", icon="TRACKING_CLEAR_FORWARDS")
+                else:
+                    col = layout.column(align=True)
+                    split = layout.split() #Splitte Rows
+                    col = split.column(align=True)
+                    col.prop(point, "tilt", text="Speed", icon="SORTTIME")
+                    col.prop(point, "radius", text="Stop Time", icon="TRACKING_CLEAR_FORWARDS")
+                    col = split.column(align=True)
+                    col.label(text=f"Result: {PointSpeedArg}")
+                    col.label(text=f"Result: {PointStopArg}")
+                    layout.label(text="")
+                    row = layout.row()
+                    row.scale_y = 1.2
+                    row.operator("galaxymap77.galaxyaddpathsetup", icon='MOD_LINEART', text="Add complex point settings")
+                #col.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_3"]', text="Distance")
+                
+
+            else:
+                layout.label(text="No Point Selected")
             
 
  #Gravity
@@ -7629,75 +8245,94 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             layout = self.layout
             scene = context.scene
             
+            ### ARGUMENT NAMEN AUS OBJEKT DATABASE NEHMEN
             
-            layout.label(text="General")
-            split = layout.split() #Splitte Rows
-            col = split.column(align=True)
-            col.label(text="Alternative Name:")
-            col = split.column(align=True)
-            col.prop(bpy.context.object, '["Object Name"]')
+            obj = context.object
+
+            if obj is None:
+                layout.label(text="Kein Objekt ausgewählt")
+                return
+            
+            #obj_name = obj.get("Object Name", "Unknown")
+            
+            obj_name = obj.modifiers["GRAVITY"].node_group.name
+            if obj.modifiers["GRAVITY"].node_group.name == "GlobalPlaneGravity":
+				#Sphere
+                if obj.modifiers["GRAVITY"]["Input_10"] == 0:
+                    if obj.modifiers["GRAVITY"]["Input_11"] == 0:
+                        obj_name = "GlobalPlaneGravity"
+                    else:
+                        obj_name = "ZeroGravitySphere"
+				#Cube
+                if obj.modifiers["GRAVITY"]["Input_10"] == 1:
+                    if obj.modifiers["GRAVITY"]["Input_11"] == 0:
+                        obj_name = "GlobalPlaneGravityInBox"
+                    else:
+                        obj_name = "ZeroGravityBox"
+				#Cylinder
+                if obj.modifiers["GRAVITY"]["Input_10"] == 2:
+                    if obj.modifiers["GRAVITY"]["Input_11"] == 0:
+                        obj_name = "GlobalPlaneGravityInCylinder"
+                    else:
+                        obj_name = "ZeroGravityCylinder"
+            
+            display_name, labels, notes = load_labels_from_xml(obj_name, 4, True)
+            
+            ##########
+                        
+            layout.label(text=f"--- {display_name} ---")
+            layout.prop(bpy.context.workspace, '["Display Notes from SMG Database"]')
+            if bpy.context.workspace["Display Notes from SMG Database"] == True:
+                if notes:
+                    import textwrap
+                    #layout.label(text="Notes:")
+                    #layout.box().label(text=notes, icon='INFO')  # Fügt einen Rahmen um den Notiztext
+                    
+                    layout.label(text="Notes:")
+                    box = layout.box()
+                    lines = notes.split("\n")
+                    
+                    col = box.column(align=True)
+                    for line in lines:
+                        words = line.split()
+                        wrapped_lines = [" ".join(words[i:i+9]) for i in range(0, len(words), 9)]
+                        
+                        for wrapped_line in wrapped_lines:
+                            col.label(text=wrapped_line)
+            
             row = layout.row()
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object, '["Layer"]')
             
             
             layout.label(text="Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Link ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Path ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Linked Area ID"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Linked Object ID]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Linked MapParts ID"]')
+            col = layout.column(align=True)
+            col.prop(bpy.context.object, '["Link ID"]')
+            col.prop(bpy.context.object, '["Path ID"]')
+            col.prop(bpy.context.object, '["Linked Area ID"]')
+            col.prop(bpy.context.object, '["Linked Object ID]')
+            col.prop(bpy.context.object, '["Linked MapParts ID"]')
             
             layout.label(text="Gravity Settings")
-            row = layout.row()
-            row.scale_y = 1.2
-            layout.label(text="(For proper settings names see modifier)")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Priority"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Inverse"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Power"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Type"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_2"]', text="Range")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_3"]', text="Distance")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_4"]', text="Arg0")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_5"]', text="Arg1")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_6"]', text="Arg2")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_7"]', text="Arg3")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_8"]', text="Scale")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_9"]', text="Path ID")
+            col = layout.column(align=True)
+            col.prop(bpy.context.object, '["Power"]')
+            col.prop(bpy.context.object, '["Priority"]')
+            col.prop(bpy.context.object, '["Inverse"]')
+            col.prop(bpy.context.object, '["Type"]')
+            col.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_2"]', text="Range")
+            col.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_3"]', text="Distance")
+            
+            col = layout.column(align=True)
+            for i in range(len(labels)):
+                inputbla = i + 4
+                col.prop(obj.modifiers["GRAVITY"], f'["Input_{inputbla}"]', text=labels[i])
+            
+            
+            
+            col.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_8"]', text="Scale")
+            
+            if obj.modifiers["GRAVITY"].node_group.name == "GlobalWireGravity":
+                col.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_9"]', text="Path ID")
             
             row = layout.row()
             row.scale_y = 1.2
@@ -7707,65 +8342,55 @@ class LayoutSMGMapObjectPanel(bpy.types.Panel):
             row.scale_y = 1.2
             row = layout.prop(bpy.context.object.modifiers["GRAVITY"], '["Input_11"]', text="Zero Gravity? (Only planar)")
             
-            layout.label(text="Arguments")
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Obj_Arg0"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Obj_Arg1"]')
-            row = layout.row(align=True)
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.object, '["Obj_Arg2"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Obj_Arg3"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Obj_Arg4"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Obj_Arg5"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Obj_Arg6"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Obj_Arg7"]')
+            
+            
+
+            
             
             layout.label(text="Switches")
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["SW_APPEAR"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["SW_DEAD"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["SW_A"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["SW_B"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["SW_AWAKE"]')
+            row = layout.row()
+            row.alignment = 'LEFT'
+            # Erste Spalte für die SW-Werte (größer)
+            col1 = row.column(align=True)
+            col1.scale_x = 2  # Macht die erste Spalte etwas größer
+            col1.prop(context.object, '["SW_APPEAR"]', text="SW_APPEAR")
+            col1.prop(context.object, '["SW_DEAD"]', text="SW_DEAD")
+            col1.prop(context.object, '["SW_A"]', text="SW_A")
+            col1.prop(context.object, '["SW_B"]', text="SW_B")
+            col1.prop(context.object, '["SW_AWAKE"]', text="SW_AWAKE")
+
+            # Geteilte Spalten für Z und G
+            split = row.split(factor=0.35)  # Teilt den verbleibenden Platz
+            col2 = split.column(align=True)
+            col2.scale_x = 1
+            col2.operator("galaxymap203.galaxyaddswitchappear", text="Z")
+            col2.operator("galaxymap204.galaxyaddswitchdead", text="Z")
+            col2.operator("galaxymap201.galaxyaddswitcha", text="Z")
+            col2.operator("galaxymap202.galaxyaddswitchb", text="Z")
+            col2.operator("galaxymap205.galaxyaddswitchawake", text="Z")
+
+            col3 = split.column(align=True)
+            col3.scale_x = 0.004
+            col3.operator("galaxymap303.galaxyaddswitchappearfull", text="G")
+            col3.operator("galaxymap304.galaxyaddswitchdeadfull", text="G")
+            col3.operator("galaxymap301.galaxyaddswitchafull", text="G")
+            col3.operator("galaxymap302.galaxyaddswitchbfull", text="G")
+            col3.operator("galaxymap305.galaxyaddswitchawakefull", text="G")
             
             layout.label(text="Groups")
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Group ID"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Clipping Group ID"]')
-            row = layout.row(align=True)
-            row.scale_y = 0.5
-            row = layout.prop(bpy.context.object, '["Cutscene Group ID"]')
+            col = layout.column(align=True)
+            col.prop(bpy.context.object, '["Group ID"]')
+            col.prop(bpy.context.object, '["Clipping Group ID"]')
+            col.prop(bpy.context.object, '["Cutscene Group ID"]')
+
+
+
 
 class LayoutSMGMapScenarioPanel(bpy.types.Panel):
 
 
     """Creates a Panel in the scene context of the properties editor"""
-    bl_label = "Mario Galaxy - Scenario"
+    bl_label = "Scenario"
     bl_idname = "SCENE_GalaxyMapScenario_layout" 
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -7773,7 +8398,7 @@ class LayoutSMGMapScenarioPanel(bpy.types.Panel):
 
     def draw(self, context):
     
-        if "Comet Time Limit" in bpy.context.scene:
+        if "Comet Time Limit" in bpy.context.view_layer:
         
             layout = self.layout
             scene = context.scene
@@ -7781,40 +8406,32 @@ class LayoutSMGMapScenarioPanel(bpy.types.Panel):
             layout.label(text="Settings")
             split = layout.split() #Splitte Rows
             col = split.column(align=True)
-            col.prop(bpy.context.scene, '["ScenarioNo"]')
+            col.prop(bpy.context.view_layer, '["ScenarioNo"]')
             col = split.column(align=True)
-            col.prop(bpy.context.scene, '["ScenarioName"]')
+            col.prop(bpy.context.view_layer, '["ScenarioName"]')
             
             row = layout.row()
             row.scale_y = 1.2
-            row = layout.prop(bpy.context.scene, '["StarMask"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.scene, '["Scenario Type"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.scene, '["Power Star Trigger"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.scene, '["Comet"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.scene, '["Comet Time Limit"]')
-            row = layout.row()
-            row.scale_y = 1.2
-            row = layout.prop(bpy.context.scene, '["LuigiModeTimer (unused)"]')
+            row = layout.prop(bpy.context.view_layer, '["StarMask"]')
+            
+            col = layout.column(align=True) 
+            col.prop(bpy.context.view_layer, '["Scenario Type"]')
+            col.prop(bpy.context.view_layer, '["Power Star Trigger"]')
+            col.prop(bpy.context.view_layer, '["Comet"]')
+            col.prop(bpy.context.view_layer, '["Comet Time Limit"]')
+            col.prop(bpy.context.view_layer, '["LuigiModeTimer (unused)"]')
             
             layout.label(text="Zone Layer Display")
             layout.label(text="(Select Zone Collection)")
             
 
             if "Zone ID" in bpy.context.collection:
-                if bpy.context.collection.name in bpy.context.scene:
+                if bpy.context.collection.name in bpy.context.view_layer:
 
                     ZoneMaskName = bpy.context.collection.name
                     row = layout.row()
                     row.scale_y = 1.2
-                    row = layout.prop(bpy.context.scene, '["' + ZoneMaskName + '"]')
+                    row = layout.prop(bpy.context.view_layer, '["' + ZoneMaskName + '"]')
                 else:
                     row = layout.row()
                     row.scale_y = 1.2
@@ -7823,7 +8440,11 @@ class LayoutSMGMapScenarioPanel(bpy.types.Panel):
                     row.scale_y = 1.2
                     row.operator("scenario55.addzone", icon='ADD') #new zone
 
-            
+        else:
+            layout = self.layout
+            scene = context.scene
+        
+            layout.label(text="View Layer is no guilty Galaxy mission")
             
             
 class LayoutSMGMapMenu1(bpy.types.Menu):
@@ -7862,6 +8483,8 @@ class LayoutSMGMap_AddObjPanel(bpy.types.Menu):
          
         layout.label(text="To Zone: "+LayoutZoneName, icon='OUTLINER_COLLECTION')
         layout.label(text="Asset Searching "+LayoutAssetSearch, icon='VIEWZOOM')
+        #layout.prop(bpy.context.workspace, '["Add this object"]')
+        #layout.prop(bpy.context.workspace, '["Asset Searching Enabled"]')
         layout.operator("galaxymap1.galaxyaddobj", icon='GHOST_DISABLED')
         layout.operator("galaxymap2.galaxyaddmappart", icon='AUTO')
         # use an operator enum property to populate a sub-menu #Kapier ich nicht
@@ -7927,7 +8550,8 @@ class LayoutSMGMap_ChangeAreaShapePanel(bpy.types.Menu):
         layout = self.layout
         layout.label(text="Select new shape", icon='WORLD_DATA')
         layout.operator("smgmaparea0.changeto0", icon='CUBE')
-        layout.operator("smgmaparea1.changeto1", icon='LIGHTPROBE_CUBEMAP')
+        #layout.operator("smgmaparea1.changeto1", icon='LIGHTPROBE_CUBEMAP') # Alte Blenderversion
+        layout.operator("smgmaparea1.changeto1", icon='LIGHTPROBE_SPHERE')
         layout.operator("smgmaparea2.changeto2", icon='SPHERE')
         layout.operator("smgmaparea3.changeto3", icon='MESH_CYLINDER')
         layout.operator("smgmaparea4.changeto4", icon='MOD_SOFT')
@@ -7984,6 +8608,7 @@ def register():
     bpy.utils.register_class(LayoutSMGMapScenarioPanel)
     
     
+    
     bpy.utils.register_class(GalaxyMap_LayoutStarter2)
     bpy.utils.register_class(GalaxyMap_LayoutStarter3)
     bpy.utils.register_class(GalaxyMap_LayoutStarter4)
@@ -8005,7 +8630,23 @@ def register():
     bpy.utils.register_class(GalaxyMapChangeAreaShape_2)
     bpy.utils.register_class(GalaxyMapChangeAreaShape_3)
     bpy.utils.register_class(GalaxyMapChangeAreaShape_4)
+    
+    
 
+    bpy.utils.register_class(GalaxyMapNewSwitch_A)
+    bpy.utils.register_class(GalaxyMapNewSwitch_B)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Appear)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Dead)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Awake)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Param)
+    
+    bpy.utils.register_class(GalaxyMapNewSwitch_A_FullGalaxy)
+    bpy.utils.register_class(GalaxyMapNewSwitch_B_FullGalaxy)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Appear_FullGalaxy)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Dead_FullGalaxy)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Awake_FullGalaxy)
+    bpy.utils.register_class(GalaxyMapNewSwitch_Param_FullGalaxy)
+    
     #bpy.types.VIEW3D_MT_object.append(menu_func)
     #bpy.utils.register_class(GalaxyMapInitialize)
     
@@ -8065,6 +8706,7 @@ def unregister():
     bpy.utils.unregister_class(LayoutSMGMap_ChangeAreaShapePanel)
     bpy.utils.unregister_class(LayoutSMGMapScenarioPanel)
     
+    
     bpy.utils.unregister_class(GalaxyMap_LayoutStarter2)
     bpy.utils.unregister_class(GalaxyMap_LayoutStarter3)
     bpy.utils.unregister_class(GalaxyMap_LayoutStarter4)
@@ -8078,6 +8720,21 @@ def unregister():
     bpy.utils.unregister_class(GalaxyMapAddGravity_Cone)
     bpy.utils.unregister_class(GalaxyMapAddGravity_Barrel)
     bpy.utils.unregister_class(GalaxyMapAddGravity_Wire)
+    
+    
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_A)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_B)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Appear)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Dead)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Awake)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Param)
+    
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_A_FullGalaxy)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_B_FullGalaxy)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Appear_FullGalaxy)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Dead_FullGalaxy)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Awake_FullGalaxy)
+    bpy.utils.unregister_class(GalaxyMapNewSwitch_Param_FullGalaxy)
     
     #bpy.types.VIEW3D_MT_object.remove(menu_func)
     #bpy.utils.unregister_class(GalaxyMapInitialize)
