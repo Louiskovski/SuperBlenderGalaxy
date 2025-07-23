@@ -44,7 +44,7 @@ To create a brand new level, start with a new Blender file and click on **Create
 
 ## Scenario Editing
 
-In Blender, each scenario is divided into scenes. To edit scenario settings, go to the **Mario Galaxy -Scenario** tab under **Mario Galaxy** right in the 3D View.
+In Blender, each scenario is divided into view layers. To edit scenario settings, go to the **Mario Galaxy -Scenario** tab under **Mario Galaxy** right in the 3D View.
 
 - **ScenarioNo** The Mission ID
 - **ScenarioName** A custom name useful for editing (ignored by the game)
@@ -68,24 +68,16 @@ Support for [Galaxy Level Engine](https://github.com/SuperHackio/GalaxyLevelEngi
 ## Editing
 
 ### Adding objects
-Be sure that Blender's command line window is open (*Window -> Toggle System Console*). As of this version it is required to enter object names in this window.
-
-To add objects, be sure that you selected the zone's collection, which you want to add your object, and click on **Add Galaxy Object** to add an object of your likeling. If Asset Searching is enabled, the plugin searches for assets in a given folder structure using your entered object name in Blender files and links them. More about this at **Asset Usage**.
-
-Once a type is selected, Blender will probably freeze briefly. If this is the case, an object name must be entered. Go to Blender's Command Line window and enter your object name. (Sorry, I don't understand how to do this with Blender's UI :P, Will probably be replaced later anyway with a selection from the ObjectDatabase) 
+To add objects, be sure that you selected the zone's collection, which you want to add your object, then go to the **Map Tools** tab and enter the object name in the *Add this object* line and click on **Add Galaxy Object** to add an object of your likeling. If Asset Searching is enabled, the plugin searches for assets in a given folder structure using your entered object name in Blender files and links them. More about this at **Asset Usage**.
 
 ### Editing objects
 Select an object and go to the *Mario Galaxy - Object Settings* tab to get all editable parameters of the selected objects such as object aruments, area shapes, gravity sizes, and more.
 
-You will also find an **Alternative Name** string. If you enter an name here, the exporter will ignore the actual object name and will use this one instead. This is required if you have multiple objects with the same name, as Blender's outliner can not store the same object name (adds an .001 to the name). When adding objects, it adds an name in this field by default.
-
 ### Paths
 
-Paths can have parameters per point, so to edit these, go to editing mode and select the point, then go to the *Item* tab to the *Transform* column:
-- **Mean Tilt** The point speed (arg 0)
-- **Mean Radius** The point stop value (arg5), but in the formula Y.XXXX (XXXX is the actual speed, Y sets, if it is enabled at all: 1 = false, 0 = true)
+Paths can have parameters per point, so to edit these, go to editing mode and select the point, then go to the *Object Settings* tab to the *Point Settings* section.
 
-To get more point settings for an extra ordinary path, click on **Path** under *Point Settings* under *Mario Galaxy - Object Settings*. This will ad an geometry node you can set in the paths modifer settings. Set *PointID* and the modifier name to the point you want to have the settings (a marker will be visible in the 3D View)
+To get more point settings for an extra ordinary path, click on **Add complex Point Settings**.
 
 The Path ID is defined here. If you add a new path, you must enter a new ID here:
 
@@ -136,7 +128,6 @@ This can take about 10 minutes however.
 
 # Plans for future versions
 
-- ObjectDatabase usage by Asset Browser (object names, info, argument/variable usage)
 - Improve Pymap usage, such as not converting CSV <-> BCSV, and instead read and write BCSV directly (to make importing and exporting much faster)
 - Replace WiiExplorer with PyKernel to directly read/write the ARC archives instead of extracting them to folders and then packing them (to avoid useless extra folders)
 - Render BDL/BMD model (good luck with that :P)
